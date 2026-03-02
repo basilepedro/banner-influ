@@ -240,8 +240,8 @@
       <div class="sidebar-section-title">Campos editáveis</div>
       <div style="display:flex;flex-direction:column;gap:14px;">
         <div class="field-group">
-          <label>👤 Nome do Influenciador</label>
-          <input type="text" id="inp-influencer" placeholder="Nome do Influenciador" />
+          <label>👤 Nome do Produtor de Conteúdo</label>
+          <input type="text" id="inp-influencer" placeholder="Nome do Produtor de Conteúdo" />
         </div>
         <div class="field-group">
           <label>🎟 Código do Cupom</label>
@@ -337,7 +337,7 @@ let currentFilter = 'todos';
 
 function renderCards() {
   const grid = document.getElementById('cards-grid');
-  const inf = document.getElementById('inp-influencer').value.trim().toUpperCase() || 'NOME DO INFLUENCIADOR';
+  const inf = document.getElementById('inp-influencer').value.trim().toUpperCase() || 'NOME DO PRODUTORIADOR';
   const cup = document.getElementById('inp-cupom').value.trim().toUpperCase() || 'CUPOM';
 
   const visible = BANNERS.filter(b => currentFilter === 'todos' || b.tipo === currentFilter);
@@ -387,7 +387,7 @@ document.getElementById('inp-cupom').addEventListener('input', renderCards);
 async function baixarUm(id) {
   const b = BANNERS.find(x => x.id === id);
   if (!b) return;
-  const inf = document.getElementById('inp-influencer').value.trim().toUpperCase() || 'INFLUENCIADOR';
+  const inf = document.getElementById('inp-influencer').value.trim().toUpperCase() || 'PRODUTOR DE CONTEÚDO';
   const cup = document.getElementById('inp-cupom').value.trim().toUpperCase() || 'CUPOM';
   await renderAndDownload(b, inf, cup);
   toast('Download iniciado: ' + b.nome);
@@ -398,7 +398,7 @@ async function baixarTodos() {
   const wrap = document.getElementById('progress-wrap');
   const bar = document.getElementById('progress-bar');
   const txt = document.getElementById('progress-text');
-  const inf = document.getElementById('inp-influencer').value.trim().toUpperCase() || 'INFLUENCIADOR';
+  const inf = document.getElementById('inp-influencer').value.trim().toUpperCase() || 'PRODUTOR DE CONTEÚDO';
   const cup = document.getElementById('inp-cupom').value.trim().toUpperCase() || 'CUPOM';
 
   const lista = currentFilter === 'todos' ? BANNERS : BANNERS.filter(b => b.tipo === currentFilter);
@@ -519,7 +519,7 @@ function cupomYoutube(inf, cup) {
       <div class="si"><span class="ck">✓</span> Investimentos internacionais</div>
       <div class="si"><span class="ck">✓</span> Advocacia internacional</div>
     </div>
-    <div class="web">amorimglobal.com</div>
+    <div class="web">www.amorimglobal.com</div>
   </div></body></html>`;
 }
 
@@ -563,7 +563,7 @@ function cupomInstagram(inf, cup) {
       <div class="si"><span class="ck">✓</span> Vistos e imigração</div>
       <div class="si"><span class="ck">✓</span> Cidadania estrangeira</div>
       <div class="si"><span class="ck">✓</span> Planejamento migratório</div>
-      <div class="web">amorimglobal.com</div>
+      <div class="web">www.amorimglobal.com</div>
     </div>
   </div></body></html>`;
 }
@@ -609,7 +609,7 @@ function cupomStory(inf, cup) {
       <div class="si"><span class="ck">✓</span> Cidadania estrangeira</div>
       <div class="si"><span class="ck">✓</span> Investimentos no exterior</div>
       <div class="si"><span class="ck">✓</span> Advocacia internacional</div>
-      <div class="web">amorimglobal.com</div>
+      <div class="web">www.amorimglobal.com</div>
     </div>
   </div></body></html>`;
 }
@@ -652,7 +652,7 @@ function servicosYoutube() {
         <div class="divider"></div>
         <div class="sub">Soluções personalizadas para quem quer viver, trabalhar ou investir fora do Brasil com segurança jurídica completa.</div>
       </div>
-      <div class="footer-web">amorimglobal.com</div>
+      <div class="footer-web">www.amorimglobal.com</div>
     </div>
     <div class="right">
       <div class="svc-list">
@@ -704,7 +704,7 @@ function servicosInstagram() {
         <div class="svc-item"><div class="svc-num">03</div><div class="svc-title">Investimentos no Exterior</div><div class="svc-sub">Imóveis, empresas e ativos com segurança jurídica</div></div>
         <div class="svc-item"><div class="svc-num">04</div><div class="svc-title">Advocacia Internacional</div><div class="svc-sub">Família, herança e contratos globais</div></div>
       </div>
-      <div class="footer"><div class="footer-web">amorimglobal.com</div><div class="footer-tag">Direito Internacional</div></div>
+      <div class="footer"><div class="footer-web">www.amorimglobal.com</div><div class="footer-tag">Direito Internacional</div></div>
     </div>
   </div></body></html>`;
 }
@@ -751,7 +751,7 @@ function servicosStory() {
         <div class="svc-item"><div class="svc-num">04</div><div><div class="svc-title">Advocacia Internacional</div><div class="svc-sub">Família, herança e contratos globais</div></div></div>
       </div>
       <div class="cta">Fale com um Especialista</div>
-      <div class="footer"><div class="footer-web">amorimglobal.com</div><div class="footer-tag">Direito Internacional</div></div>
+      <div class="footer"><div class="footer-web">www.amorimglobal.com</div><div class="footer-tag">Direito Internacional</div></div>
     </div>
   </div></body></html>`;
 }
