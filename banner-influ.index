@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amorim — Central de Banners</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #070d1a;
+    --surface: #0d1626;
+    --surface2: #111e32;
+    --border: rgba(255,255,255,0.08);
+    --green: #00ff88;
+    --blue: #1a6bff;
+    --text: #e8eef8;
+    --muted: #5a7090;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 20px 48px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: rgba(7,13,26,0.9);
+    backdrop-filter: blur(12px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo-icon {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--blue); overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .logo-icon img { width: 26px; height: 26px; object-fit: contain; }
+  header h1 { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; color: #fff; }
+  header span { color: var(--muted); font-size: 13px; margin-left: 6px; }
+
+  /* ── MAIN LAYOUT ── */
+  .page { display: flex; min-height: calc(100vh - 77px); }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 320px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 32px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    position: sticky;
+    top: 77px;
+    height: calc(100vh - 77px);
+    overflow-y: auto;
+  }
+  .sidebar-section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .field-group { display: flex; flex-direction: column; gap: 6px; }
+  .field-group label { font-size: 13px; color: #8899aa; font-weight: 500; }
+  .field-group input {
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 11px 14px;
+    border-radius: 8px;
+    outline: none;
+    width: 100%;
+    transition: border-color .2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .field-group input:focus { border-color: var(--green); }
+  .field-group input::placeholder { color: var(--muted); font-weight: 400; letter-spacing: 0; text-transform: none; }
+
+  .divider { height: 1px; background: var(--border); }
+
+  /* Batch download */
+  .btn-batch {
+    background: var(--green);
+    color: #000;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 14px 0;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    transition: background .2s, transform .1s;
+  }
+  .btn-batch:hover { background: #00dd66; }
+  .btn-batch:active { transform: scale(.98); }
+  .btn-batch:disabled { background: #1a3a28; color: #2a6a48; cursor: not-allowed; }
+
+  .progress-wrap { display: none; flex-direction: column; gap: 8px; }
+  .progress-wrap.visible { display: flex; }
+  .progress-bar-outer {
+    height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden;
+  }
+  .progress-bar-inner {
+    height: 100%; background: var(--green); border-radius: 3px;
+    width: 0%; transition: width .3s ease;
+  }
+  .progress-text { font-size: 12px; color: var(--muted); }
+
+  /* Type filter pills */
+  .pills { display: flex; gap: 8px; flex-wrap: wrap; }
+  .pill {
+    padding: 6px 14px; border-radius: 20px;
+    border: 1.5px solid var(--border);
+    font-size: 12px; font-weight: 600;
+    color: var(--muted); cursor: pointer;
+    transition: all .2s; background: transparent;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .pill.active { border-color: var(--blue); color: #fff; background: rgba(26,107,255,.15); }
+
+  /* ── MAIN CONTENT ── */
+  .main { flex: 1; padding: 40px 48px; overflow-x: hidden; }
+
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 28px;
+  }
+  .section-title {
+    font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; color: #fff;
+  }
+  .section-count {
+    font-size: 12px; color: var(--muted);
+    background: var(--surface2); padding: 4px 12px; border-radius: 20px;
+    border: 1px solid var(--border);
+  }
+
+  /* ── BANNER CARDS ── */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 24px;
+  }
+
+  .banner-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color .2s, transform .2s;
+  }
+  .banner-card:hover {
+    border-color: rgba(26,107,255,.4);
+    transform: translateY(-2px);
+  }
+
+  .card-preview {
+    position: relative;
+    background: #060c18;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .card-preview iframe {
+    border: none;
+    display: block;
+    pointer-events: none;
+  }
+  .preview-overlay {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0);
+    opacity: 0; transition: opacity .2s;
+  }
+  .card-preview:hover .preview-overlay {
+    opacity: 1; background: rgba(0,0,0,.45);
+  }
+  .preview-overlay span {
+    font-size: 12px; font-weight: 700; color: #fff; letter-spacing: 2px;
+    text-transform: uppercase; background: rgba(26,107,255,.8);
+    padding: 8px 18px; border-radius: 4px;
+  }
+
+  .card-info {
+    padding: 16px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px;
+  }
+  .card-meta { flex: 1; min-width: 0; }
+  .card-name { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: #fff; }
+  .card-dim { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  .card-type {
+    font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 20px;
+  }
+  .type-cupom { background: rgba(0,255,136,.1); color: var(--green); border: 1px solid rgba(0,255,136,.2); }
+  .type-servicos { background: rgba(26,107,255,.1); color: #6699ff; border: 1px solid rgba(26,107,255,.2); }
+
+  .btn-dl {
+    background: var(--blue); color: #fff;
+    border: none; border-radius: 6px; cursor: pointer;
+    padding: 9px 16px; font-size: 12px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    transition: background .2s; white-space: nowrap;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-dl:hover { background: #0055dd; }
+
+  /* hidden render area */
+  #render-area {
+    position: fixed; left: -9999px; top: 0;
+    pointer-events: none; z-index: -1;
+  }
+
+  /* toast */
+  #toast {
+    position: fixed; bottom: 32px; right: 32px;
+    background: var(--surface2); border: 1px solid var(--green);
+    color: #fff; font-size: 13px; font-weight: 500;
+    padding: 12px 22px; border-radius: 8px;
+    opacity: 0; transform: translateY(10px);
+    transition: opacity .3s, transform .3s;
+    pointer-events: none; z-index: 999;
+  }
+  #toast.show { opacity: 1; transform: translateY(0); }
+
+  /* ── HIDDEN BANNERS FOR RENDERING ── */
+  /* Cupom styles */
+  .b-cupom {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    overflow: hidden; position: relative;
+  }
+  /* (banner HTML injected inline via JS) */
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-icon"><img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCADiAOcDASIAAhEBAxEB/8QAHQABAAICAwEBAAAAAAAAAAAAAAcIBgkDBAUBAv/EAEcQAAEDAwEGAwMHCAkDBQAAAAEAAgMEBREGBxIhMUFhCFGBEyJxFCMyQlJikRUkN3KCkqGxFiUzQ3SEorTBY5PCNLKz4fD/xAAcAQEAAwEBAQEBAAAAAAAAAAAABQYHBAgDAgH/xAA/EQABAwICBwQIBAUDBQAAAAABAAIDBAURIQYSMUFRYXGBkaHRExQiMrHB4fAHI1JyFTM0QvEWorI1YoKS4v/aAAwDAQACEQMRAD8AilEReo1lSIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIi5KaCeqqGU9NDJPNId1kcbS5zj5ADiUJAGJRcaKV9HbAteX5rJ66ngsdM7jvVrj7XHaNuTns7dUmQeHHTFpsdZWXO7XK6VcNNI9jWBsERcGkj3Rl3MfaVcrNLLVSu1DLrO4Nz8dnipOG0Vco1g3Ac8vqquIizXYTXfk7a9pmo3sb9a2D/ugx/+anKqYwQPlAxLQThxwGOC4ImCSRrCcMSAsNmhmhDTLFJHvDLd5pGfgvwtkK6FfZLNcARX2i31YJyfbUzH5/ELNmfiS3H26bud/wDKsztGTuk8PqtdqK8172P7N7s0+30rRU7jydR71Pj0YQPxCjnU/hltEzXyac1BV0cnMRVjBKwny3m7pA9HKZpNPrXMcJNZnUYjwx+C4ptH6pmbcHdPqqvos+1vsg13pNr56y0OraNmSaqhJmjAHUgDeaO7gAsBVupayCrZ6SB4cORxUPLDJC7VkaQeaIiLpXyRERERERERERERERERERERERERERERACSAASTwAC7Nqt9bdbjBbrbSy1dXUPDIoYm7znnsFbfYhsVt2kIob1qCOKvv5Ac0H3oqPszzf5u/DHMwd8v9LZ4teXNx2NG0+Q5rvoLfLWvwZkBtKiXZdsC1DqT2dw1IZbFbDgiN7PzqUdmH6A7u7e6QrLaH0JpbRlL7GwWqGnkLcSVLvfmk/WeeOOwwPILJUWMXjSWvuriJXYM/SMh28e1XajtlPSD2RieJ2/RFx1UXt6WWDe3faMLM4zjIwuRFAA4HEKQOa1vva5jyx7S1zTggjBBXZtFbJbrtR3CIZkpZ2TNHdrg4fyXe1xRG3a0vlvLd35NcZ4sfqyOH/C8denWObNEHbnD4rLXAsdhvC2O0s8dTTRVMLt6OVgew+YIyCuRYLsDvIvmySwVJfvSwUwpJc8w6I7nHuQ0H1WdLzVWU7qWofC7a0kdxwWmwyCWNrxvAKIiLmX1RRxtK2N6R1mySp+TC1XVwJFZSMDd53nIzk/48D3UjouqjraiikEtO8tdy+8+1fKaCOdupIMQqH7TNnGpdA14iu9MJaORxFPXQ5MUvbP1XY+qePPGRxWHLYvd7bQXe2z2250kNXR1DdyWGVu81w/8A3XoqhbedkFToepdeLM2aq09M7G873n0jjya89Wno70PHBOvaM6ZMuJFNVYNk3Hc7yPLfu4KnXSyupgZYs2+I+iiVERXtQCIiIiIiIiIiIiIiIiIiIiLkpKeerqoqWlhfNPM8RxxsGXPcTgADqSVxqzfhU2atpqRmu71Tg1EzSLXE8f2bDwM2PN3JvbJ6jETe7vFaaR1RJmdgHE8PPkuyho31cwjb2ngFmmwTZXTaEtAuNyjin1DVM+ek5imacfNMP8yOZ7AKUkRefq+unr53VE5xcfvAcgtDp4GU8YjjGACIiLjX2REREVI/EjbDbNsd8aGgR1Lo6lnDGd9jS7/VvKOlYLxoWYxX6xX9jBu1NM+kkI843bzc/ESH91V9XofRqq9atUEn/aB2ty+Szm5xeiq5G88e/NWW8GGoA6jvml5X+9G9tdA3zBAZJ+BEf4qxaonsP1M3Sm020XOaQMpHy/Jqok4Aik90k9mkh37KvYst07t/q1zMwHsyDHtGR+R7Va7BUelpdQ7W5dm5ERFSlNoiIiIuGtpaauo5qOsgjqKeZhjlikaHNe0jBBB5hcyL+gkHEIRiqUbetmk2gdQiaibJLYq5xNJKeJjdzMTj5joeo7gqNVsE17pe36x0rW2C5NHs6hnzcmMuhkH0XjuD+IyOqoVqO0V1gvtbZblF7Kro5nRSt6ZB5jzBHEHqCFuOh+kBulMYpj+azbzG4/I9+9US8271WXXZ7rvA8PJdBERXFQqIiIiIiIiIiIiIiIizXYrot+ude0dpkDhQRfnFc8dIWkZGehcSGjyznor008MVPBHTwRsiiiaGRsYMNa0DAAHQAKIvCnpJth2ei9VEQbW3pwnyRxbAMiMevvO/aHkpgWF6aXc19wMbT7EeQ67z35dAr5ZKP1enDj7zs+zciIujVXBtPeqG3vwPlcczmnrvM3Dj8C4+iqTWF5wH3hmpgkDau8iIvyv6iIiIou8UGnzfNk1bPFHv1FrkbXMwOO63LX+m45x/ZVL1sbrqWCuoZ6KqjEkFRG6KVh5Oa4YI/ArXzq+yVGm9UXKxVWTLQ1L4d4jG+Afdd8CMH1Wt/h1X68ElI45tOsOh29xHiqhpJT6sjZhvy7vvwXlK8ewLVo1fs1t9XLLv11G35HWZ5mRgGHH9Zu674kqjilrwu60/ozr5tqq5d23Xrdp35PBk2fmnfiS39rspvTO0m4W4uYPbj9odN47s+oC4LLV+r1IDtjsvJXHREWEq/IiIiIiIiIq0eMfSTYqm26zpYsCb8zrcD6wBMbj8QHNz91qsusS2xWAal2aXy1CPfmdSulpxjj7WP32AfEtA9VOaOXE2+5RTY5Y4Hocj3bexcNyphU0zmb9o6hULREXodZwiIiIiIiIiIiIi9PSVnl1Bqi2WSHIfXVUcGR9UOcAT6DJ9F5il3wl2htx2sx1j25bbaOWpGeW8cRj/AOQn0Ufdaz1KilqN7Wkjru8V0UkPp52R8SFb6hpYKGhgoqWMRwU8bYomDk1rRgD8AuZEXm0kk4laaBhkEUe7WrkLLqbQd0e8tj/LZo5PLdnhezj8Dg+ikJRB4t4JX7K4quEua+iukE4cM5acPYD+LwpaxRtmuEcTtjsW/wDsCPmuOvcWU7njdn3HFS+i8bQ97j1Ho+032MjFbSRyuA+q8j3m+jsj0XsqMljdE8xvGYOB7F1McHtDhsKIiL5r9Iqv+MXSZpr1b9Y00R9lWNFLVkDgJWjLCe5aCP2FaBY9tI0xT6x0VctPzkNNTF8zIf7uVvFjvRwGe2QpvR26fwy4Rzn3djuh2923sXDcqX1qndGNu0dfvJa/19Y5zHh7HFrmnIIOCCua5UdVbrhUW+thfBVU0ropo3DBY9pwQfULgXocEOGI2FZyQQcCrv7BNdM1zoaCaolDrtQhtPXtzxLgPdk+DwM/EOHRSEqI7G9c1OgtZwXRu++gm+ZroRx34ieJA+03mPhjkSrz2+spbhQwV1FOyemqI2yRSsOWvaRkEeiwnS6xG11hdGPy35jlxHZu5K+2ev8AWocHH2m7fNc6Iiqal0RERERERFr21xbBZtZ3q0taGso6+aBgHLda8gfwAXjqQvEdSfI9tGoYwCGvkilBweO/Cxx/iSo9Xpa2zmoo4pT/AHNae8ArMamP0cz2cCR4oiIu1fBERERERERFZDwUUQzqe4uHH83gYf8AuOd/4qt6tT4L42jRV7mGd51xDT5YEbSP5lVPTeQss0oG8tH+4KXsbdatbyx+CnhERYQr8iwTxAW43PY7qOAM3nRUwqRwyR7J7ZCfwaVna6t4oYrnaKy2z/2VXA+B/D6r2lp/gV1UNR6tUxzfpcD3HFfKeP0sTmcQQoV8Hmpvl+ja7TU8mZrXP7SEE/3MpJwPg8P/AHgp0VINieopdCbWKV1e/wBhTumdb7gCcBrXO3ST2a8Nd8GlXfVm02t3qlyMrfdk9odd/jn2qLsdT6amDDtbl5eXYiIip6mURERFWHxc6DNJcYtc22H5iqLYbiGj6EoGGSfBwG6e4HVyr4tieoLTQ32yVlnucImo6uIxSs7HqPIjmD0ICohtK0hcNEauq7FXguDDv082MCeEk7rx+GD5EEdFsugt9FXTepSn22bObfps6YKl36g9DJ6dg9l23kfqsbVgPCztOFuqo9D32oxRzv8A6tmeeEUhPGI/dcTkeTuH1uFf0BIIIJBHEEK2Xa1w3SldTzbDsPA7iPvkoijqn0sokZ/kLZCihTw47WWanoItL6hqQL5TM3YJpHca1gHn1kAHHqRx88TWvPtzts9tqHU84wI7iOI5FaHS1MdTGJIzkUREXAuhERERU18V0TY9sVY8E5kpIHHPnuY/4CihS14s/wBL8/8AgoP5FRKvRWjpxtVP+xvwWb3L+rk6lERFMriRERERERERWo8F8rTou9wgHebcQ4npgxtA/wDaVVdWO8FNcBNqe2uIy5tPOwfAyNd/Nqqem0ZfZpSN2qf9wUvY3ata3nj8FZNERYQr8iIiIqQ+IyxusW128sDN2GteK6I/aEgy4/v749FZbw66zGsNndMKmXfuVsxSVeTxdge4/wDab18w5YF4zNOGa12fVUEeXUzzR1LgOO473mE9g4OHxeFEewXXR0NrqGpqZHC1VuKevHRrCfdkx5tPHzxvDqtclpf9Q6NxvZnLGMuOLciP/IZ9cFT2S/w65uDvdd88/Aq8KL4xzXsa9jg5rhlrgcgjzX1ZGrgiIiIij3bns6p9oGljHA2OO80YMlDM7hk9Y3H7LsehAPmDISLpo6yWinbPCcHNOI++HFfKaFk8ZjeMQVrkrqSpoa2airIJKepgeY5YpG4cxwOCCPNcKtl4kdkv9JaWTVWnKYflqBn5zTxt41jB1A6yAfvDhzAVTXAtcWuBBBwQeYXoCxXuG70wmjycPeHA+XA/PFZ7X0L6OXUds3HiuaiqqmhrIayjnkp6iF4kiljcWuY4HIII5FW/2CbXabW1Gyy3uSKn1DCzs1tY0fXYOjvNvqOGQKdLkpZ56WpiqaaaSGeJ4fHJG4tcxwOQQRyIK/F+sFPeINSTJw9128eY4hf233CSik1m5g7QtjqKDNhm3Gmv7YNP6vmjpbvwZBWHDYqo9AejX/wPY8DOawm52uptk5gqG4HwI4g/fNX2lqoqqPXjOXwRERR66VTjxZ/pfn/wUH8iolUp+KqR79stxa45DKena3sPZg/zJUWL0Xo8MLVT/sb8Fm9xONXJ1KIiKYXEiIiIiIiIilnwo3gWza3T0r37rLlSy0vE8N7Akb65jx6qJl39N3WoseoLfeaX+2oamOoYPMtcDj4HGFwXSj9do5af9TSO3DLxXRSzegmZJwIWxJF1rXW09ytlLcaR+/T1ULJonebXAEH8CuyvNjmlpIO1aYCCMQiIi/i/q8DaHp2LVmirrp+XdBq6dzYnO5MkHvMd6ODSqA1dPPSVc1LUxOinhe6ORjhxa4HBB+BC2Oqofiv0cbFrkagpIQ2hvQMjt0cG1Dcb4/a4O7ku8lo/4e3QRTvonnJ+Y6jb3j4KtaRUmvG2du7I9P8APxUk+FXaIL3Y/wCh11mzcbbHmke48ZqccN3uWcv1ceRKnNa7LBdq+xXqkvFrqHU9ZSSCSKQdCOh8wRwI6gkK8+yrXFu17pSG70ZbHUtxHW02cmCXHEfqnmD1HcEDl020eNHOayEflvOfJ3kfjlwX1sdx9NH6F59obOY+iyxERUJWBERERFAPiF2Lm8PqtXaTh/rHBkraBjf/AFPm9n3/ADb9bmOP0p+RSVqutRa6gTwHPeNxHArmq6SOqjMcg+i1vva5jyx7S1zTggjBBXxW7257FKPV3tr9pxsVHfsF0sf0Yqz49Gv+9yPXzFTrtbq603Ge3XOkmpKuB25LDK3dc0/BbrY7/S3iHXiODhtbvHmOfzVCrrfLRvwfs3Hiuqpx2Nbea/T4gsmrzNcLU3DIqse9PTjoD9tg/eHTPAKDkXZcrXS3KEw1LcR4jmDuXxpqqWlfrxnArYpY7vbL5bIbnaK6Cto5hlksLt4Ht2I6g8R1XdVAtBa41Joi5fLbBXuia4gzU7/ehmA6PZ1+IwR0IVotmW3fS2qBFRXh7LFdHcNyd/zEh+7IeAz5Ox5DKx6+aF1luJkgHpI+I2jqPmPBXKgvcNTg1/su8D0KgTxPyuk22XxhAxG2maMeXyeM/wDJUaKR/EyQdt2oCCCD8mwR/holHC1yxDC2U/7Gf8QqfX/1Un7j8UREUquRERERERERERERW58JerhedCyadqZQayzP3WAni6B5JafQ7zewDfNTQqFbJdYVGh9cUV8jLnUwPsqyMf3kLsbw+I4OHdoV76Crpq+hgrqOZk9NURtlikaeD2OGQR8QVh2m1nNDXmZg9iTMdd4+fbyV7sdYJ6cMPvNy7Ny5kRFTVNIsS2uaOh1xoausjt1tVj21HI76k7Qd09geLT2cVlqL7U1RJTStmjODmnEdi/EsbZWFjthWuOspp6OrmpKqJ8NRBI6OWN4w5jmnBBHmCFk+yvXVz0DqeO7UOZad+GVlKThs8eeXYjmD0PYkGWPFns9dSVw11aoPzeoLY7kxg+hJybL8HcAe4H2lXtehLfV019t4eRi14wcOB3jy7Cs6qIZaCo1QcCNhWwzSeoLVqiwUt7s1QJ6OpblpxhzSOBa4dHA8CF6qozsd2lXXZ7fPaxb9Vaahw+WUe9wcPts8njz68j2uppi+2rUtjprzZqtlVR1Dcse3mD1a4dHDkQVjekmjc1nmxGcTvdPyPP47eIF0tlyZWszycNo+Y5L0kRFWVKIiIiIsL2obNdOa/t/s7nD8nr42kU9fC0e1j8gftNz9U98YPFZoi+9NVTUsolhcWuGwhfOWJkrSx4xBVEtpmzTU2gqwi503t6BzsQ18AJhf5A/Zd2PpnmsLWxyspqespZaSrgiqKeVpZJFKwOa9p5gg8CFA203w6W64OluGiqlluqD7xoZ3EwO/UdxLPgcj4BatY9PYZgIq8arv1DYeo3fDoqnXaPvZi+nzHDf9VVxF7Gq9L6g0rXmhv9pqaCXJDTIz3JMdWOHuuHcErx1ocUrJWB8ZBB3jMKuOa5h1XDAr6973u3nvc4gAZJzwAwB6AAL4iL9r8oiIiIiIiIiIiIiIiIrF+FTaYyBzNB3yoDWPcTapnngHE5MJPc8W98jq0Kui+xvfHI2SN7mPaQWuacEEciCou8WqG60rqeXfsPA7j97l10VW+klEjP8AIWyBFDXh72uwauo4tO6gnbHqCFmGSOIArWjqPvgcx15jqBMq8/XG3T26odTzjAjuI4jkVodNUx1MYkjORRERcK+66t3t1FdrXU2y407Kikqo3RTRP5OaRgj/AO1Rna7oWu0Dq2a1zh8tFLmShqSOEsWev3hyI9eRCvgsT2p6HtuvdLS2iuAiqG/OUdSG5dBLjge4PIjqO4BFq0V0hNoqcJP5Tve5cx038R2KJu1uFZFi33hs8lQpZlsr2iXzZ9eTV253t6KYgVdFI7DJgOv3XDo4fxHBeBqqwXTTN+qrJeKZ1PV0z91wPJw6OaerSOIK8xbfLDT10Go8B7HDsI+9hVFY+SCTFuTgr+7Pta2HXFkbc7HVb+MCenfgSwOP1Xt6djyPQrJFrz0pqK86WvMV3sVdLR1Uf1mn3Xjq1w5OafIq2GyLbhYtXthtl7dDZ72cNDHOxBUO/wCm48ifsk58iVj2kWhk9vJmpcXxeLevEc+9XO23qOowZLk7wKlxERUdTqIiIiIiIi6l4tdtvFBJQXWhpq6lk+lDPGHtPfB691C2ufDfp25F9Tpevms05yfYS5mgPYZO838XfBToikrfd623O1qaQt5bj1ByXNUUcFSMJW4/HvWvfW+m7hpHVFbp26OgfV0ZaHuhcXMO8xrwQSAeTh0XjKSPE3+nDUP+W/20Sjdeg7ZUPqaKGZ/vOa0nqQCVnVVGIp3sbsBI7iiIi7l8ERERERERERERERERFyUs89LUxVNNNJDPE8PjkjcWuY4HIII5EFWj2IbdqS7xwWDWlRHS3IYZDXuw2Ko6AP6Mf35HsedWEUPebHS3eH0c4zGwjaPveF20VdLRv1mHLeNxWyEcRkIqZ7KNt2o9Gtittw3rzZm4aIJX/Owt/wCm/wAvunI4cMK0Ggdomk9bQA2S6Ruqt3L6Ob3J2efunmB5tyO6xe9aL11qcXPbrM/UNnbw7cuBKu1FdYKsYA4O4H5cVliIiriklHu2vZlbtoNjLmhlNe6WM/IqrGM9fZv82E/uk5HUGl1+tFysN2ntV3o5aOtp3bskUgwR5HuDzBHAhbE1gO2LZjaNoVqHtd2ku9OwikrWt4jruP8AtMz6jmOoN50U0sdbSKapOMR2He36cR2jnA3a0CpHpYvf+P1VHEXsax0zetJXyaz32jfTVMZ4HmyRvRzHfWafP8cHgvHWzxSslYHxnEHYQqU5rmEtcMCFLWy7brqbSYit92Lr5aW8AyaT5+IfckOcgfZdnyGFZ3QO0LSmt6b2liuTHztGZKSYbk8fxaeY7tyO6oQv3TzTU07J6eWSGWM7zHxuLXNPmCOSqV60MobiTJH+W/iNh6j5jDtUvRXuem9l3tN57ewrY8iqBoPxB6wsIjpb22PUFG3hmd25UNHaQDj+0Ce6nXRm2/QGowyJ90/JFW7+4uAEQz2f9A/iD2WZXPRK528klmu3i3Pw2juVopbvS1GQdgeBy+ikpF+YZI5omywyMkjeMtc05BHmCv0qyclKIiIiKk3ib/ThqH/Lf7aJRupI8Tf6cNQ/5b/bRKN16Psf/TKb9jP+IWa1/wDVSfuPxRERSi5EREREREREREREREREREREX6hkkhlZLDI+ORhDmvYcFpHIgjkvyiHNFKWjNu+vdPNjgqa2K9UjBj2de0ueB2kGHZ/WJUtab8S2l6trWX2z3G2Snm6EtnjHr7rv9JVU0Vbr9ErVWkudFqni3LwGXgpOnu9XBkHYjnn9Vem0bXNm90DTT6tt8RPSqLqfHx9oGrIabVOmKpm/Tajs87cA5jrY3DB5citeqKuy/hxSk/lzOHUA+SkmaSyj3mA9481ezaDbNBa1sb7bf7jbHsaC6KobVxtlp3faa7PDuOR6hU82kaRj0jejS0t+tV6o5MmGoo6pj3Y8pGNcSw8ux6E8cYsin7Do9LZ8WtqC5h/tIy6jPL5qPuFxZWZmPB3HFERFZ1FIiIiL2dN6r1LpuTfsV8r7eM5LIZiGOPdv0T6hSdp3xHa4oGtjulNbbuwc3yRGKU+rCG/6VDCKNrLPQVudRE1x44Z9+1dUNbUQfy3kffBWmsvic07MGi8acudG44BNNIydo78dw49Fl1t277Mqxo377JRvP1KijlB/FrSP4qlaKuVGgNpl9zWb0PmCpKPSCrbtwPUeWCzrb9drbfdrd7utorIqyin9h7KaM5a7dp42nHwII9FgqIrbR0zaWnZA04hgA7hgoeaUyyOkO0knvRERdC+aIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIi/9k=" /></div>
+  <h1>Amorim <span>— Central de Banners</span></h1>
+</header>
+
+<div class="page">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div>
+      <div class="sidebar-section-title">Campos editáveis</div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="field-group">
+          <label>👤 Nome do Influenciador</label>
+          <input type="text" id="inp-influencer" placeholder="Ex: João Silva" />
+        </div>
+        <div class="field-group">
+          <label>🎟 Código do Cupom</label>
+          <input type="text" id="inp-cupom" placeholder="Ex: RESSACA" />
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div>
+      <div class="sidebar-section-title">Filtrar por tipo</div>
+      <div class="pills">
+        <button class="pill active" onclick="filtrar('todos', this)">Todos</button>
+        <button class="pill" onclick="filtrar('cupom', this)">Cupom</button>
+        <button class="pill" onclick="filtrar('servicos', this)">Serviços</button>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div>
+      <div class="sidebar-section-title">Download em lote</div>
+      <button class="btn-batch" id="btn-batch" onclick="baixarTodos()">
+        ⬇ Baixar todos os banners
+      </button>
+      <div class="progress-wrap" id="progress-wrap" style="margin-top:12px;">
+        <div class="progress-bar-outer">
+          <div class="progress-bar-inner" id="progress-bar"></div>
+        </div>
+        <div class="progress-text" id="progress-text">Gerando...</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="section-header">
+      <div class="section-title">Todos os banners</div>
+      <div class="section-count" id="count-label">6 banners</div>
+    </div>
+    <div class="cards-grid" id="cards-grid"></div>
+  </main>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- Hidden render container -->
+<div id="render-area"></div>
+
+<script>
+const LOGO = "data:image/jpeg;base64,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";
+
+// ─── Banner definitions ───────────────────────────────────────────────
+const BANNERS = [
+  {
+    id: 'b01', tipo: 'cupom',
+    nome: 'Cupom — YouTube', dim: '1280 × 720',
+    w: 1280, h: 720,
+    scale: 340/1280,
+    html: (inf, cup) => cupomYoutube(inf, cup)
+  },
+  {
+    id: 'b02', tipo: 'cupom',
+    nome: 'Cupom — Instagram', dim: '1080 × 1080',
+    w: 1080, h: 1080,
+    scale: 340/1080,
+    html: (inf, cup) => cupomInstagram(inf, cup)
+  },
+  {
+    id: 'b03', tipo: 'cupom',
+    nome: 'Cupom — Story', dim: '1080 × 1920',
+    w: 1080, h: 1920,
+    scale: 340/1080,
+    html: (inf, cup) => cupomStory(inf, cup)
+  },
+  {
+    id: 'b04', tipo: 'servicos',
+    nome: 'Serviços — YouTube', dim: '1280 × 720',
+    w: 1280, h: 720,
+    scale: 340/1280,
+    html: () => servicosYoutube()
+  },
+  {
+    id: 'b05', tipo: 'servicos',
+    nome: 'Serviços — Instagram', dim: '1080 × 1080',
+    w: 1080, h: 1080,
+    scale: 340/1080,
+    html: () => servicosInstagram()
+  },
+  {
+    id: 'b06', tipo: 'servicos',
+    nome: 'Serviços — Story', dim: '1080 × 1920',
+    w: 1080, h: 1920,
+    scale: 340/1080,
+    html: () => servicosStory()
+  }
+];
+
+// ─── State ────────────────────────────────────────────────────────────
+let currentFilter = 'todos';
+
+// ─── Render cards ────────────────────────────────────────────────────
+function renderCards() {
+  const grid = document.getElementById('cards-grid');
+  const inf = document.getElementById('inp-influencer').value.trim().toUpperCase() || 'NOME DO INFLUENCIADOR';
+  const cup = document.getElementById('inp-cupom').value.trim().toUpperCase() || 'CUPOM';
+
+  const visible = BANNERS.filter(b => currentFilter === 'todos' || b.tipo === currentFilter);
+  document.getElementById('count-label').textContent = visible.length + ' banner' + (visible.length !== 1 ? 's' : '');
+
+  grid.innerHTML = '';
+  visible.forEach(b => {
+    const ph = b.h * b.scale;
+    const isSt = b.h > b.w;
+    const card = document.createElement('div');
+    card.className = 'banner-card';
+    card.dataset.id = b.id;
+    card.innerHTML = `
+      <div class="card-preview" style="height:${ph}px" onclick="baixarUm('${b.id}')">
+        <iframe
+          srcdoc="${escHtml(b.html(inf, cup))}"
+          style="width:${b.w}px;height:${b.h}px;transform:scale(${b.scale});transform-origin:top left;"
+          scrolling="no"
+        ></iframe>
+        <div class="preview-overlay"><span>⬇ Baixar PNG</span></div>
+      </div>
+      <div class="card-info">
+        <div class="card-meta">
+          <div class="card-name">${b.nome}</div>
+          <div class="card-dim">${b.dim}</div>
+        </div>
+        <span class="card-type type-${b.tipo}">${b.tipo === 'cupom' ? 'Cupom' : 'Serviços'}</span>
+        <button class="btn-dl" onclick="event.stopPropagation();baixarUm('${b.id}')">⬇ PNG</button>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ─── Filter ──────────────────────────────────────────────────────────
+function filtrar(tipo, el) {
+  currentFilter = tipo;
+  document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  renderCards();
+}
+
+// ─── Live update on input ────────────────────────────────────────────
+document.getElementById('inp-influencer').addEventListener('input', renderCards);
+document.getElementById('inp-cupom').addEventListener('input', renderCards);
+
+// ─── Download single ─────────────────────────────────────────────────
+async function baixarUm(id) {
+  const b = BANNERS.find(x => x.id === id);
+  if (!b) return;
+  const inf = document.getElementById('inp-influencer').value.trim().toUpperCase() || 'INFLUENCIADOR';
+  const cup = document.getElementById('inp-cupom').value.trim().toUpperCase() || 'CUPOM';
+  await renderAndDownload(b, inf, cup);
+  toast('Download iniciado: ' + b.nome);
+}
+
+// ─── Download all ────────────────────────────────────────────────────
+async function baixarTodos() {
+  const btn = document.getElementById('btn-batch');
+  const wrap = document.getElementById('progress-wrap');
+  const bar = document.getElementById('progress-bar');
+  const txt = document.getElementById('progress-text');
+  const inf = document.getElementById('inp-influencer').value.trim().toUpperCase() || 'INFLUENCIADOR';
+  const cup = document.getElementById('inp-cupom').value.trim().toUpperCase() || 'CUPOM';
+
+  const lista = currentFilter === 'todos' ? BANNERS : BANNERS.filter(b => b.tipo === currentFilter);
+  btn.disabled = true;
+  wrap.classList.add('visible');
+
+  for (let i = 0; i < lista.length; i++) {
+    txt.textContent = `Gerando ${i+1} de ${lista.length}: ${lista[i].nome}...`;
+    bar.style.width = ((i / lista.length) * 100) + '%';
+    await sleep(80);
+    await renderAndDownload(lista[i], inf, cup);
+    await sleep(600);
+  }
+
+  bar.style.width = '100%';
+  txt.textContent = `✓ ${lista.length} banners baixados!`;
+  await sleep(2000);
+  wrap.classList.remove('visible');
+  bar.style.width = '0%';
+  btn.disabled = false;
+  toast('Todos os banners foram baixados!');
+}
+
+// ─── Core render ─────────────────────────────────────────────────────
+function renderAndDownload(b, inf, cup) {
+  return new Promise(resolve => {
+    const area = document.getElementById('render-area');
+    const wrap = document.createElement('div');
+    wrap.style.cssText = `width:${b.w}px;height:${b.h}px;position:absolute;top:0;left:0;`;
+    wrap.innerHTML = b.html(inf, cup);
+    area.appendChild(wrap);
+
+    // give browser time to paint
+    setTimeout(() => {
+      const el = wrap.querySelector('#banner') || wrap.firstElementChild;
+      html2canvas(el, { scale: 2, useCORS: true, logging: false }).then(canvas => {
+        const slug = (inf + '_' + cup).toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'');
+        const fname = `amorim_${b.id}_${b.nome.toLowerCase().replace(/[^a-z0-9]+/g,'_')}_${slug}.png`;
+        const link = document.createElement('a');
+        link.download = fname;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        area.removeChild(wrap);
+        resolve();
+      });
+    }, 300);
+  });
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ─── Toast ───────────────────────────────────────────────────────────
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// BANNER HTML GENERATORS
+// ═══════════════════════════════════════════════════════════════════
+
+function cupomYoutube(inf, cup) {
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{width:1280px;height:720px;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif;}
+  #banner{width:1280px;height:720px;position:relative;display:flex;background:linear-gradient(135deg,#0d1b2e 60%,#0a1828 100%);}
+  .ctr{position:absolute;top:-80px;right:-80px;width:320px;height:320px;border-radius:50%;border:60px solid #1a3a6e;opacity:.7;}
+  .cbl{position:absolute;bottom:-120px;left:220px;width:320px;height:320px;border-radius:50%;border:50px solid #0f2a4a;opacity:.5;}
+  .left{flex:1;padding:48px 60px;display:flex;flex-direction:column;justify-content:space-between;position:relative;z-index:10;}
+  .lb{display:flex;align-items:center;gap:10px;}
+  .li{width:36px;height:36px;border-radius:50%;background:#1a6bff;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+  .li img{width:28px;height:28px;object-fit:contain;}
+  .lt{color:#fff;font-size:18px;font-weight:500;}
+  .cnt{flex:1;display:flex;flex-direction:column;justify-content:center;padding-top:20px;}
+  .tag{color:#00ff88;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;}
+  .inf{color:#00ff88;font-size:13px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;}
+  .hl{color:#fff;font-size:52px;font-weight:800;line-height:1.1;margin-bottom:16px;}
+  .sub{color:#8899aa;font-size:16px;margin-bottom:32px;}
+  .cb{display:flex;align-items:center;margin-bottom:16px;}
+  .cl{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);color:#aabbcc;font-size:11px;font-weight:600;letter-spacing:2px;padding:14px 20px;text-transform:uppercase;}
+  .cc{background:#00ff44;color:#000;font-size:22px;font-weight:800;letter-spacing:4px;padding:14px 32px;text-transform:uppercase;}
+  .disc{color:#8899aa;font-size:15px;}.disc strong{color:#00ff88;}
+  .right{width:420px;padding:60px 40px;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:10;}
+  .sl{color:#8899aa;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin-bottom:20px;}
+  .si{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.06);border-left:3px solid #1a6bff;padding:14px 20px;margin-bottom:10px;color:#fff;font-size:15px;font-weight:600;}
+  .ck{color:#00ff88;font-size:14px;font-weight:700;}
+  .web{position:absolute;top:40px;right:40px;color:#8899aa;font-size:12px;z-index:10;}
+  </style></head><body>
+  <div id="banner">
+    <div class="ctr"></div><div class="cbl"></div>
+    <div class="left">
+      <div class="lb"><div class="li"><img src="${LOGO}"/></div><span class="lt">Amorim</span></div>
+      <div class="cnt">
+        <div class="tag">Oferta exclusiva para seguidores de</div>
+        <div class="inf">${inf}</div>
+        <div class="hl">Seu visto e sua<br>vida no exterior.</div>
+        <div class="sub">Assessoria jurídica internacional completa.</div>
+        <div class="cb"><div class="cl">Cupom</div><div class="cc">${cup}</div></div>
+        <div class="disc"><strong>10% de desconto</strong> na primeira consulta</div>
+      </div>
+    </div>
+    <div class="right">
+      <div class="sl">Nossos Serviços</div>
+      <div class="si"><span class="ck">✓</span> Vistos internacionais</div>
+      <div class="si"><span class="ck">✓</span> Imigração e regularização</div>
+      <div class="si"><span class="ck">✓</span> Investimentos internacionais</div>
+      <div class="si"><span class="ck">✓</span> Direito internacional</div>
+    </div>
+    <div class="web">amorimglobal.com</div>
+  </div></body></html>`;
+}
+
+function cupomInstagram(inf, cup) {
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{width:1080px;height:1080px;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif;}
+  #banner{width:1080px;height:1080px;position:relative;display:flex;flex-direction:column;background:linear-gradient(135deg,#0d1b2e 60%,#0a1828 100%);}
+  .tb{height:8px;background:#00ff44;width:100%;}
+  .ctr{position:absolute;top:-80px;right:-80px;width:300px;height:300px;border-radius:50%;border:55px solid #1a3a6e;opacity:.7;}
+  .cbl{position:absolute;bottom:-130px;left:160px;width:340px;height:340px;border-radius:50%;border:55px solid #0f2a4a;opacity:.45;}
+  .cnt{flex:1;padding:50px 70px;display:flex;flex-direction:column;position:relative;z-index:10;}
+  .lb{display:flex;align-items:center;gap:10px;margin-bottom:40px;}
+  .li{width:40px;height:40px;border-radius:50%;background:#1a6bff;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+  .li img{width:30px;height:30px;object-fit:contain;}
+  .lt{color:#fff;font-size:20px;font-weight:500;}
+  .tag{color:#00ff88;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;}
+  .inf{color:#00ff88;font-size:14px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;}
+  .hl{color:#fff;font-size:62px;font-weight:800;line-height:1.1;margin-bottom:14px;}
+  .sub{color:#8899aa;font-size:18px;margin-bottom:32px;}
+  .cb{display:flex;align-items:center;margin-bottom:14px;}
+  .cl{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);color:#aabbcc;font-size:12px;font-weight:600;letter-spacing:2px;padding:16px 24px;text-transform:uppercase;}
+  .cc{background:#00ff44;color:#000;font-size:26px;font-weight:800;letter-spacing:4px;padding:16px 40px;text-transform:uppercase;}
+  .disc{color:#8899aa;font-size:16px;margin-bottom:36px;}.disc strong{color:#00ff88;}
+  .dv{height:1px;background:rgba(255,255,255,.1);margin-bottom:24px;}
+  .si{display:flex;align-items:center;gap:14px;border-left:3px solid #1a6bff;background:rgba(255,255,255,.05);padding:16px 24px;margin-bottom:10px;color:#fff;font-size:16px;font-weight:600;}
+  .ck{color:#00ff88;font-size:15px;font-weight:700;}
+  .web{color:#556677;font-size:13px;margin-top:auto;padding-top:16px;}
+  </style></head><body>
+  <div id="banner">
+    <div class="tb"></div><div class="ctr"></div><div class="cbl"></div>
+    <div class="cnt">
+      <div class="lb"><div class="li"><img src="${LOGO}"/></div><span class="lt">Amorim</span></div>
+      <div class="tag">Oferta exclusiva para seguidores de</div>
+      <div class="inf">${inf}</div>
+      <div class="hl">Seu visto.<br>Sua nova vida.</div>
+      <div class="sub">Assessoria jurídica internacional.</div>
+      <div class="cb"><div class="cl">Cupom</div><div class="cc">${cup}</div></div>
+      <div class="disc"><strong>10% de desconto</strong> na primeira consulta</div>
+      <div class="dv"></div>
+      <div class="si"><span class="ck">✓</span> Vistos e imigração</div>
+      <div class="si"><span class="ck">✓</span> Investimentos internacionais</div>
+      <div class="si"><span class="ck">✓</span> Planejamento migratório</div>
+      <div class="web">amorimglobal.com</div>
+    </div>
+  </div></body></html>`;
+}
+
+function cupomStory(inf, cup) {
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{width:1080px;height:1920px;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif;}
+  #banner{width:1080px;height:1920px;position:relative;display:flex;flex-direction:column;background:linear-gradient(160deg,#0d1b2e 55%,#091420 100%);}
+  .ctr{position:absolute;top:-90px;right:-90px;width:400px;height:400px;border-radius:50%;border:70px solid #1a3a6e;opacity:.7;}
+  .cbl{position:absolute;bottom:-160px;left:100px;width:420px;height:420px;border-radius:50%;border:65px solid #0f2a4a;opacity:.45;}
+  .cnt{flex:1;padding:90px 80px 80px;display:flex;flex-direction:column;position:relative;z-index:10;}
+  .lb{display:flex;align-items:center;gap:14px;margin-bottom:80px;}
+  .li{width:50px;height:50px;border-radius:50%;background:#1a6bff;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+  .li img{width:38px;height:38px;object-fit:contain;}
+  .lt{color:#fff;font-size:26px;font-weight:500;}
+  .tag{color:#00ff88;font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin-bottom:12px;}
+  .inf{color:#00ff88;font-size:16px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:24px;}
+  .hl{color:#fff;font-size:82px;font-weight:800;line-height:1.05;margin-bottom:24px;}
+  .sub{color:#8899aa;font-size:20px;margin-bottom:60px;}
+  .cs{background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.12);padding:20px 30px 10px;}
+  .clt{color:#8899aa;font-size:12px;font-weight:600;letter-spacing:3px;text-transform:uppercase;margin-bottom:10px;}
+  .cc{display:block;background:#00ff44;color:#000;font-size:46px;font-weight:800;letter-spacing:6px;padding:24px 0;text-align:center;text-transform:uppercase;width:calc(100% + 60px);margin-left:-30px;}
+  .disc{color:#8899aa;font-size:18px;margin-top:20px;margin-bottom:60px;}.disc strong{color:#00ff88;}
+  .dv{height:1px;background:rgba(255,255,255,.1);margin-bottom:36px;}
+  .si{display:flex;align-items:center;gap:16px;border-left:4px solid #1a6bff;background:rgba(255,255,255,.05);padding:22px 28px;margin-bottom:14px;color:#fff;font-size:20px;font-weight:600;}
+  .ck{color:#00ff88;font-size:18px;font-weight:700;}
+  .web{color:#556677;font-size:15px;margin-top:40px;}
+  </style></head><body>
+  <div id="banner">
+    <div class="ctr"></div><div class="cbl"></div>
+    <div class="cnt">
+      <div class="lb"><div class="li"><img src="${LOGO}"/></div><span class="lt">Amorim</span></div>
+      <div class="tag">Oferta exclusiva para seguidores de</div>
+      <div class="inf">${inf}</div>
+      <div class="hl">Seu visto.<br>Sua nova vida<br>no exterior.</div>
+      <div class="sub">Assessoria jurídica internacional completa.</div>
+      <div class="cs"><div class="clt">Cupom exclusivo</div><div class="cc">${cup}</div></div>
+      <div class="disc"><strong>10% de desconto</strong> na consulta</div>
+      <div class="dv"></div>
+      <div class="si"><span class="ck">✓</span> Vistos internacionais</div>
+      <div class="si"><span class="ck">✓</span> Imigração e regularização</div>
+      <div class="si"><span class="ck">✓</span> Investimentos no exterior</div>
+      <div class="si"><span class="ck">✓</span> Direito internacional</div>
+      <div class="si"><span class="ck">✓</span> Planejamento migratório</div>
+      <div class="web">amorimglobal.com</div>
+    </div>
+  </div></body></html>`;
+}
+
+function servicosYoutube() {
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{width:1280px;height:720px;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif;}
+  #banner{width:1280px;height:720px;position:relative;display:flex;background:linear-gradient(135deg,#0a1628 0%,#0d1f3c 50%,#081428 100%);}
+  .lg{position:absolute;left:0;top:0;width:860px;height:100%;background:radial-gradient(ellipse at 20% 60%,rgba(0,80,200,.18) 0%,transparent 70%);}
+  .rp{position:absolute;right:0;top:0;width:480px;height:100%;background:rgba(10,30,70,.55);border-left:1px solid rgba(255,255,255,.06);}
+  .tb{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#00ff88,#0066ff);}
+  .ctr{position:absolute;top:-100px;right:350px;width:280px;height:280px;border-radius:50%;border:50px solid rgba(20,60,140,.4);}
+  .cl{position:absolute;left:0;top:0;width:780px;height:100%;display:flex;flex-direction:column;justify-content:center;padding:60px 70px;z-index:10;}
+  .lb{display:flex;align-items:center;gap:10px;margin-bottom:44px;}
+  .li{width:34px;height:34px;border-radius:50%;background:#1a6bff;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+  .li img{width:26px;height:26px;object-fit:contain;}
+  .lt{color:#fff;font-size:17px;font-weight:500;}
+  .tag{color:#00ff88;font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;margin-bottom:18px;}
+  .hl{color:#fff;font-size:58px;font-weight:800;line-height:1.05;margin-bottom:20px;}
+  .sub{color:#8899bb;font-size:16px;line-height:1.6;max-width:480px;margin-bottom:36px;}
+  .btn{display:inline-block;background:#1a6bff;color:#fff;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;padding:14px 36px;}
+  .cr{position:absolute;right:0;top:0;width:480px;height:100%;display:flex;flex-direction:column;justify-content:center;padding:50px 44px;z-index:10;gap:12px;}
+  .si{display:flex;align-items:center;gap:16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-left:3px solid #1a6bff;padding:16px 20px;}
+  .ic{font-size:22px;flex-shrink:0;}
+  .st{color:#fff;font-size:14px;font-weight:700;}
+  .ss{color:#6688aa;font-size:12px;margin-top:2px;}
+  </style></head><body>
+  <div id="banner">
+    <div class="lg"></div><div class="rp"></div><div class="tb"></div><div class="ctr"></div>
+    <div class="cl">
+      <div class="lb"><div class="li"><img src="${LOGO}"/></div><span class="lt">Amorim</span></div>
+      <div class="tag">Advocacia Internacional</div>
+      <div class="hl">Um mundo<br>sem fronteiras.</div>
+      <div class="sub">Assessoria jurídica especializada para quem quer viver, trabalhar ou investir fora do Brasil.</div>
+      <div class="btn">Fale com um Especialista</div>
+    </div>
+    <div class="cr">
+      <div class="si"><div class="ic">🛂</div><div><div class="st">Vistos Internacionais</div><div class="ss">EUA, Europa, Canadá e mais</div></div></div>
+      <div class="si"><div class="ic">✈️</div><div><div class="st">Imigração</div><div class="ss">Regularização e residência</div></div></div>
+      <div class="si"><div class="ic">📈</div><div><div class="st">Investimentos</div><div class="ss">Abertura de empresa e ativos</div></div></div>
+      <div class="si"><div class="ic">⚖️</div><div><div class="st">Direito Internacional</div><div class="ss">Contratos e planejamento</div></div></div>
+    </div>
+  </div></body></html>`;
+}
+
+function servicosInstagram() {
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{width:1080px;height:1080px;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif;}
+  #banner{width:1080px;height:1080px;position:relative;background:linear-gradient(145deg,#0a1628 0%,#0d1f3c 60%,#081428 100%);}
+  .tb{position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#00ff88,#0066ff);}
+  .ctr{position:absolute;top:-80px;right:-80px;width:300px;height:300px;border-radius:50%;border:55px solid rgba(20,60,140,.35);}
+  .cnt{position:absolute;top:0;left:0;right:0;bottom:0;padding:56px 64px;display:flex;flex-direction:column;z-index:10;}
+  .lb{display:flex;align-items:center;gap:10px;margin-bottom:40px;}
+  .li{width:38px;height:38px;border-radius:50%;background:#1a6bff;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+  .li img{width:28px;height:28px;object-fit:contain;}
+  .lt{color:#fff;font-size:19px;font-weight:500;}
+  .tag{color:#00ff88;font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;margin-bottom:14px;}
+  .hl{color:#fff;font-size:64px;font-weight:800;line-height:1.05;margin-bottom:48px;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;flex:1;}
+  .sc{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-top:3px solid #1a6bff;padding:28px 24px;display:flex;flex-direction:column;gap:10px;}
+  .ic{font-size:28px;}
+  .st{color:#fff;font-size:18px;font-weight:700;}
+  .ss{color:#6688aa;font-size:13px;}
+  .web{color:#445566;font-size:13px;margin-top:28px;}
+  </style></head><body>
+  <div id="banner">
+    <div class="tb"></div><div class="ctr"></div>
+    <div class="cnt">
+      <div class="lb"><div class="li"><img src="${LOGO}"/></div><span class="lt">Amorim</span></div>
+      <div class="tag">Advocacia Internacional</div>
+      <div class="hl">Um mundo<br>sem fronteiras.</div>
+      <div class="grid">
+        <div class="sc"><div class="ic">🛂</div><div class="st">Vistos</div><div class="ss">EUA, Europa, Canadá</div></div>
+        <div class="sc"><div class="ic">✈️</div><div class="st">Imigração</div><div class="ss">Regularização e residência</div></div>
+        <div class="sc"><div class="ic">📈</div><div class="st">Investimentos</div><div class="ss">Empresa e ativos no exterior</div></div>
+        <div class="sc"><div class="ic">⚖️</div><div class="st">Direito</div><div class="ss">Contratos internacionais</div></div>
+      </div>
+      <div class="web">amorimglobal.com</div>
+    </div>
+  </div></body></html>`;
+}
+
+function servicosStory() {
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{width:1080px;height:1920px;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif;}
+  #banner{width:1080px;height:1920px;position:relative;display:flex;flex-direction:column;background:linear-gradient(160deg,#0a1628 0%,#0d1f3c 50%,#081428 100%);}
+  .tb{height:4px;width:100%;background:linear-gradient(90deg,#00ff88,#0066ff);flex-shrink:0;}
+  .ctr{position:absolute;top:-90px;right:-90px;width:380px;height:380px;border-radius:50%;border:65px solid rgba(20,60,140,.35);}
+  .cbl{position:absolute;bottom:-150px;left:80px;width:400px;height:400px;border-radius:50%;border:60px solid rgba(15,40,90,.3);}
+  .cnt{flex:1;padding:80px 72px 80px;display:flex;flex-direction:column;position:relative;z-index:10;}
+  .lb{display:flex;align-items:center;gap:12px;margin-bottom:64px;}
+  .li{width:46px;height:46px;border-radius:50%;background:#1a6bff;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+  .li img{width:34px;height:34px;object-fit:contain;}
+  .lt{color:#fff;font-size:24px;font-weight:500;}
+  .tag{color:#00ff88;font-size:12px;font-weight:700;letter-spacing:4px;text-transform:uppercase;margin-bottom:18px;}
+  .hl{color:#fff;font-size:80px;font-weight:800;line-height:1.05;margin-bottom:20px;}
+  .sub{color:#8899bb;font-size:20px;line-height:1.6;margin-bottom:64px;}
+  .svcs{display:flex;flex-direction:column;gap:14px;margin-bottom:auto;}
+  .si{display:flex;align-items:center;gap:20px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-left:4px solid #1a6bff;padding:22px 28px;}
+  .ic{font-size:28px;flex-shrink:0;}
+  .st{color:#fff;font-size:20px;font-weight:700;}
+  .ss{color:#6688aa;font-size:15px;margin-top:4px;}
+  .btn{margin-top:60px;background:#1a6bff;color:#fff;font-size:15px;font-weight:700;letter-spacing:3px;text-transform:uppercase;padding:26px 0;text-align:center;}
+  </style></head><body>
+  <div id="banner">
+    <div class="tb"></div><div class="ctr"></div><div class="cbl"></div>
+    <div class="cnt">
+      <div class="lb"><div class="li"><img src="${LOGO}"/></div><span class="lt">Amorim</span></div>
+      <div class="tag">Advocacia Internacional</div>
+      <div class="hl">Um mundo<br>sem<br>fronteiras.</div>
+      <div class="sub">Assessoria jurídica para quem quer viver, trabalhar ou investir fora do Brasil.</div>
+      <div class="svcs">
+        <div class="si"><div class="ic">🛂</div><div><div class="st">Vistos Internacionais</div><div class="ss">EUA, Europa, Canadá e mais</div></div></div>
+        <div class="si"><div class="ic">✈️</div><div><div class="st">Imigração e Regularização</div><div class="ss">Residência e documentação</div></div></div>
+        <div class="si"><div class="ic">📈</div><div><div class="st">Investimentos no Exterior</div><div class="ss">Empresa, imóveis e ativos</div></div></div>
+        <div class="si"><div class="ic">⚖️</div><div><div class="st">Direito Internacional</div><div class="ss">Contratos e planejamento</div></div></div>
+      </div>
+      <div class="btn">Fale com um Especialista</div>
+    </div>
+  </div></body></html>`;
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────
+renderCards();
+</script>
+</body>
+</html>
