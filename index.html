@@ -147,6 +147,10 @@ const BANNERS = [
   { id:'b04', tipo:'servicos', nome:'Serviços — YouTube', dim:'1280 × 720',  w:1280, h:720,  scale:340/1280, html:()=>servicosYoutube() },
   { id:'b05', tipo:'servicos', nome:'Serviços — Instagram',dim:'1080 × 1080',w:1080, h:1080, scale:340/1080, html:()=>servicosInstagram() },
   { id:'b06', tipo:'servicos', nome:'Serviços — Story',   dim:'1080 × 1920', w:1080, h:1920, scale:340/1080, html:()=>servicosStory() },
+  { id:'b07', tipo:'cupom',    nome:'Cupom — Meia Tela YT (1280×720)', dim:'1280 × 720',  w:1280, h:720,  scale:340/1280, html:(i,c)=>cupomMeiaTela(i,c) },
+  { id:'b08', tipo:'servicos', nome:'Serviços — Meia Tela YT (1280×720)', dim:'1280 × 720',  w:1280, h:720,  scale:340/1280, html:()=>servicosMeiaTela() },
+  { id:'b09', tipo:'cupom',    nome:'Cupom — Meia Tela Recorte (640×720)', dim:'640 × 720',   w:640,  h:720,  scale:340/640,  html:(i,c)=>cupomMeiaTelaRecorte(i,c) },
+  { id:'b10', tipo:'servicos', nome:'Serviços — Meia Tela Recorte (640×720)', dim:'640 × 720',   w:640,  h:720,  scale:340/640,  html:()=>servicosMeiaTelaRecorte() },
 ];
 
 let currentFilter = 'todos';
@@ -529,6 +533,169 @@ body{width:1080px;height:1920px;overflow:hidden;${BASE_FONT}}
       <div class="cta-text">amorimglobal.com</div>
       <div class="cta-btn">Fale conosco →</div>
     </div>
+  </div>
+</div></body></html>`;}
+
+
+// ── CUPOM MEIA TELA 1280×720 (lado direito) ──────────────────────────
+function cupomMeiaTela(inf,cup){return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+${BASE_RESET}
+body{width:1280px;height:720px;overflow:hidden;${BASE_FONT}}
+#banner{width:1280px;height:720px;position:relative;background:linear-gradient(135deg,#0a1628 0%,#0d1f3c 50%,#081428 100%);}
+/* left half — transparent/empty for webcam */
+.left-empty{position:absolute;left:0;top:0;width:640px;height:100%;background:transparent;}
+/* right panel */
+.rp{position:absolute;right:0;top:0;width:640px;height:100%;background:linear-gradient(160deg,#070d1a 0%,#0a1628 60%,#0c1f40 100%);border-left:1px solid rgba(255,255,255,.07);}
+.tb{position:absolute;top:0;right:0;width:640px;height:3px;background:linear-gradient(90deg,#00ff88,#1a6bff);z-index:20;}
+.ctr{position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;border:45px solid rgba(20,60,140,.35);}
+.cnt{position:absolute;right:0;top:0;width:640px;height:100%;display:flex;flex-direction:column;justify-content:center;padding:52px 56px;z-index:10;}
+.lb{display:flex;align-items:center;gap:10px;margin-bottom:32px;}
+.li{width:32px;height:32px;display:flex;align-items:center;justify-content:center;}
+.li img{width:100%;height:100%;object-fit:contain;}
+.lt{color:#fff;font-size:16px;font-weight:500;}
+.tag{color:#00ff88;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px;}
+.inf{color:#00ff88;font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;}
+.hl{color:#fff;font-size:44px;font-weight:800;line-height:1.05;margin-bottom:6px;}
+.slogan{color:#00ff88;font-size:12px;font-weight:600;letter-spacing:2px;font-style:italic;margin-bottom:18px;}
+.sub{color:#8899aa;font-size:13px;margin-bottom:22px;}
+.cb{display:flex;align-items:center;margin-bottom:12px;}
+.cl2{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);color:#aabbcc;font-size:10px;font-weight:600;letter-spacing:2px;padding:12px 16px;text-transform:uppercase;}
+.cc{background:#00ff44;color:#000;font-size:20px;font-weight:800;letter-spacing:4px;padding:12px 26px;text-transform:uppercase;}
+.disc{color:#8899aa;font-size:13px;}.disc strong{color:#00ff88;}
+.web{color:#445566;font-size:11px;margin-top:18px;}
+</style></head><body>
+<div id="banner">
+  <div class="left-empty"></div>
+  <div class="rp"></div>
+  <div class="tb"></div><div class="ctr"></div>
+  <div class="cnt">
+    <div class="lb"><div class="li"><img src="${LOGO}"/></div><span class="lt">Amorim Global</span></div>
+    <div class="tag">Oferta exclusiva para seguidores de</div>
+    <div class="inf">${inf}</div>
+    <div class="hl">Seu visto e sua<br>vida no exterior.</div>
+    <div class="slogan">Globalize Your Goals</div>
+    <div class="sub">Consultoria para Mobilidade Internacional.</div>
+    <div class="cb"><div class="cl2">Cupom</div><div class="cc">${cup}</div></div>
+    <div class="disc"><strong>10% de desconto</strong> na primeira consulta</div>
+    <div class="web">amorimglobal.com</div>
+  </div>
+</div></body></html>`;}
+
+// ── SERVIÇOS MEIA TELA 1280×720 (lado direito) ───────────────────────
+function servicosMeiaTela(){return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+${BASE_RESET}
+body{width:1280px;height:720px;overflow:hidden;${BASE_FONT}}
+#banner{width:1280px;height:720px;position:relative;background:transparent;}
+.left-empty{position:absolute;left:0;top:0;width:640px;height:100%;background:transparent;}
+.rp{position:absolute;right:0;top:0;width:640px;height:100%;background:linear-gradient(160deg,#070d1a 0%,#0a1628 60%,#0c1f40 100%);border-left:1px solid rgba(255,255,255,.07);}
+.tb{position:absolute;top:0;right:0;width:640px;height:3px;background:linear-gradient(90deg,#00ff88,#1a6bff);z-index:20;}
+.ctr{position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;border:45px solid rgba(20,60,140,.35);}
+.cnt{position:absolute;right:0;top:0;width:640px;height:100%;display:flex;flex-direction:column;justify-content:center;padding:52px 56px;z-index:10;}
+.lb{display:flex;align-items:center;gap:10px;margin-bottom:36px;}
+.li{width:32px;height:32px;display:flex;align-items:center;justify-content:center;}
+.li img{width:100%;height:100%;object-fit:contain;}
+.lt{color:#fff;font-size:16px;font-weight:500;}
+.hl{color:#fff;font-size:46px;font-weight:800;line-height:1.0;margin-bottom:6px;}
+.slogan{color:#00ff88;font-size:12px;font-weight:600;letter-spacing:2px;font-style:italic;margin-bottom:28px;}
+.svcs{display:flex;flex-direction:column;gap:0;margin-bottom:28px;}
+.si{display:flex;align-items:center;gap:16px;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.07);}
+.si:last-child{border-bottom:none;}
+.ic-wrap{width:36px;height:36px;border-radius:8px;background:rgba(26,107,255,.12);border:1px solid rgba(26,107,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sit{color:#fff;font-size:14px;font-weight:700;}
+.sis{color:#6688aa;font-size:11px;margin-top:2px;}
+.btn{display:inline-block;background:#1a6bff;color:#fff;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:12px 28px;}
+</style></head><body>
+<div id="banner">
+  <div class="left-empty"></div>
+  <div class="rp"></div>
+  <div class="tb"></div><div class="ctr"></div>
+  <div class="cnt">
+    <div class="lb"><div class="li"><img src="${LOGO}"/></div><span class="lt">Amorim Global</span></div>
+    <div class="hl">Levamos pessoas e<br>empresas para o mundo.</div>
+    <div class="slogan">Globalize Your Goals</div>
+    <div class="svcs">
+      <div class="si"><div class="ic-wrap">${iVisa}</div><div><div class="sit">Imigração &amp; Vistos</div><div class="sis">Cidadania, naturalização, residência global</div></div></div>
+      <div class="si"><div class="ic-wrap">${iInv}</div><div><div class="sit">Investimentos &amp; Tributação</div><div class="sis">Planejamento e estruturação no exterior</div></div></div>
+      <div class="si"><div class="ic-wrap">${iLaw}</div><div><div class="sit">Negócios Internacionais</div><div class="sis">Contratos, fusões e internacionalização</div></div></div>
+      <div class="si"><div class="ic-wrap">${iImig}</div><div><div class="sit">Família &amp; Sucessões</div><div class="sis">Direito de família e sentenças estrangeiras</div></div></div>
+    </div>
+    <div class="btn">Fale com um Especialista →</div>
+  </div>
+</div></body></html>`;}
+
+// ── CUPOM MEIA TELA RECORTE 640×720 ──────────────────────────────────
+function cupomMeiaTelaRecorte(inf,cup){return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+${BASE_RESET}
+body{width:640px;height:720px;overflow:hidden;${BASE_FONT}}
+#banner{width:640px;height:720px;position:relative;display:flex;flex-direction:column;background:linear-gradient(160deg,#070d1a 0%,#0a1628 60%,#0c1f40 100%);}
+.tb{height:3px;width:100%;background:linear-gradient(90deg,#00ff88,#1a6bff);flex-shrink:0;}
+.ctr{position:absolute;top:-50px;right:-50px;width:200px;height:200px;border-radius:50%;border:40px solid rgba(20,60,140,.35);}
+.cnt{flex:1;padding:44px 48px;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:10;}
+.lb{display:flex;align-items:center;gap:10px;margin-bottom:28px;}
+.li{width:30px;height:30px;display:flex;align-items:center;justify-content:center;}
+.li img{width:100%;height:100%;object-fit:contain;}
+.lt{color:#fff;font-size:15px;font-weight:500;}
+.tag{color:#00ff88;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px;}
+.inf{color:#00ff88;font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;}
+.hl{color:#fff;font-size:44px;font-weight:800;line-height:1.05;margin-bottom:6px;}
+.slogan{color:#00ff88;font-size:12px;font-weight:600;letter-spacing:2px;font-style:italic;margin-bottom:18px;}
+.sub{color:#8899aa;font-size:13px;margin-bottom:22px;}
+.cb{display:flex;align-items:center;margin-bottom:12px;}
+.cl2{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);color:#aabbcc;font-size:10px;font-weight:600;letter-spacing:2px;padding:12px 16px;text-transform:uppercase;}
+.cc{background:#00ff44;color:#000;font-size:20px;font-weight:800;letter-spacing:4px;padding:12px 26px;text-transform:uppercase;}
+.disc{color:#8899aa;font-size:13px;}.disc strong{color:#00ff88;}
+.web{color:#445566;font-size:11px;margin-top:18px;}
+</style></head><body>
+<div id="banner">
+  <div class="tb"></div><div class="ctr"></div>
+  <div class="cnt">
+    <div class="lb"><div class="li"><img src="${LOGO}"/></div><span class="lt">Amorim Global</span></div>
+    <div class="tag">Oferta exclusiva para seguidores de</div>
+    <div class="inf">${inf}</div>
+    <div class="hl">Seu visto e sua<br>vida no exterior.</div>
+    <div class="slogan">Globalize Your Goals</div>
+    <div class="sub">Consultoria para Mobilidade Internacional.</div>
+    <div class="cb"><div class="cl2">Cupom</div><div class="cc">${cup}</div></div>
+    <div class="disc"><strong>10% de desconto</strong> na primeira consulta</div>
+    <div class="web">amorimglobal.com</div>
+  </div>
+</div></body></html>`;}
+
+// ── SERVIÇOS MEIA TELA RECORTE 640×720 ───────────────────────────────
+function servicosMeiaTelaRecorte(){return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+${BASE_RESET}
+body{width:640px;height:720px;overflow:hidden;${BASE_FONT}}
+#banner{width:640px;height:720px;position:relative;display:flex;flex-direction:column;background:linear-gradient(160deg,#070d1a 0%,#0a1628 60%,#0c1f40 100%);}
+.tb{height:3px;width:100%;background:linear-gradient(90deg,#00ff88,#1a6bff);flex-shrink:0;}
+.ctr{position:absolute;top:-50px;right:-50px;width:200px;height:200px;border-radius:50%;border:40px solid rgba(20,60,140,.35);}
+.cnt{flex:1;padding:44px 48px;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:10;}
+.lb{display:flex;align-items:center;gap:10px;margin-bottom:32px;}
+.li{width:30px;height:30px;display:flex;align-items:center;justify-content:center;}
+.li img{width:100%;height:100%;object-fit:contain;}
+.lt{color:#fff;font-size:15px;font-weight:500;}
+.hl{color:#fff;font-size:42px;font-weight:800;line-height:1.0;margin-bottom:6px;}
+.slogan{color:#00ff88;font-size:12px;font-weight:600;letter-spacing:2px;font-style:italic;margin-bottom:26px;}
+.svcs{display:flex;flex-direction:column;gap:0;margin-bottom:26px;}
+.si{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.07);}
+.si:last-child{border-bottom:none;}
+.ic-wrap{width:34px;height:34px;border-radius:8px;background:rgba(26,107,255,.12);border:1px solid rgba(26,107,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sit{color:#fff;font-size:13px;font-weight:700;}
+.sis{color:#6688aa;font-size:11px;margin-top:2px;}
+.btn{display:inline-block;background:#1a6bff;color:#fff;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:12px 24px;}
+</style></head><body>
+<div id="banner">
+  <div class="tb"></div><div class="ctr"></div>
+  <div class="cnt">
+    <div class="lb"><div class="li"><img src="${LOGO}"/></div><span class="lt">Amorim Global</span></div>
+    <div class="hl">Levamos pessoas e<br>empresas para o mundo.</div>
+    <div class="slogan">Globalize Your Goals</div>
+    <div class="svcs">
+      <div class="si"><div class="ic-wrap">${iVisa}</div><div><div class="sit">Imigração &amp; Vistos</div><div class="sis">Cidadania, naturalização, residência global</div></div></div>
+      <div class="si"><div class="ic-wrap">${iInv}</div><div><div class="sit">Investimentos &amp; Tributação</div><div class="sis">Planejamento e estruturação no exterior</div></div></div>
+      <div class="si"><div class="ic-wrap">${iLaw}</div><div><div class="sit">Negócios Internacionais</div><div class="sis">Contratos, fusões e internacionalização</div></div></div>
+      <div class="si"><div class="ic-wrap">${iImig}</div><div><div class="sit">Família &amp; Sucessões</div><div class="sis">Direito de família e sentenças estrangeiras</div></div></div>
+    </div>
+    <div class="btn">Fale com um Especialista →</div>
   </div>
 </div></body></html>`;}
 
