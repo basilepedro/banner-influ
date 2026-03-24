@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Amorim Global — Central de Banners</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap');
 
@@ -354,34 +355,61 @@ const BANNERS = [
     id: 'b09', tipo: 'amorim',
     nome: 'Amorim — YouTube Meia Tela', dim: '640 × 720',
     w: 640, h: 720, scale: 340/640,
-    html: (inf, cup, lnk) => mktYoutubeMeiaTela(lnk)
+    html: (inf, cup, lnk, qr) => mktYoutubeMeiaTela(lnk, qr)
   },
   {
     id: 'b10', tipo: 'amorim',
     nome: 'Amorim — YouTube Tela Cheia', dim: '1280 × 720',
     w: 1280, h: 720, scale: 340/1280,
-    html: (inf, cup, lnk) => mktYoutubeTela(lnk)
+    html: (inf, cup, lnk, qr) => mktYoutubeTela(lnk, qr)
   },
   {
     id: 'b11', tipo: 'amorim',
     nome: 'Amorim — Story', dim: '1080 × 1920',
     w: 1080, h: 1920, scale: 340/1080,
-    html: (inf, cup, lnk) => mktStory(lnk)
+    html: (inf, cup, lnk, qr) => mktStory(lnk, qr)
   },
   {
     id: 'b12', tipo: 'amorim',
     nome: 'Amorim — Post', dim: '1080 × 1350',
     w: 1080, h: 1350, scale: 340/1080,
-    html: (inf, cup, lnk) => mktPost(lnk)
+    html: (inf, cup, lnk, qr) => mktPost(lnk, qr)
   }];
 
 let currentFilter = 'todos';
 
-function renderCards() {
+
+// ── QR Code generator (runs in outer page, returns data URL) ──────────────
+function makeQrDataUrl(text, size) {
+  return new Promise((resolve) => {
+    if (!text) { resolve(''); return; }
+    const div = document.createElement('div');
+    div.style.cssText = 'position:absolute;left:-9999px;top:-9999px;';
+    document.body.appendChild(div);
+    const qr = new QRCode(div, {
+      text: text,
+      width: size,
+      height: size,
+      colorDark: '#ffffff',
+      colorLight: '#3366ff',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+    // QRCode renders synchronously into a canvas
+    setTimeout(() => {
+      const canvas = div.querySelector('canvas');
+      const dataUrl = canvas ? canvas.toDataURL('image/png') : '';
+      document.body.removeChild(div);
+      resolve(dataUrl);
+    }, 50);
+  });
+}
+
+async function renderCards() {
   const grid = document.getElementById('cards-grid');
   const inf = document.getElementById('inp-influencer').value.trim().toUpperCase() || 'PRODUTOR DE CONTEÚDO';
   const cup = document.getElementById('inp-cupom').value.trim().toUpperCase() || 'CUPOM';
   const lnk = document.getElementById('inp-link').value.trim() || '';
+  const qrDataUrl = await makeQrDataUrl(lnk, 300);
 
   const visible = BANNERS.filter(b => currentFilter === 'todos' || b.tipo === currentFilter);
   document.getElementById('count-label').textContent = visible.length + ' banner' + (visible.length !== 1 ? 's' : '');
@@ -395,7 +423,7 @@ function renderCards() {
     card.innerHTML = `
       <div class="card-preview" style="height:${ph}px" onclick="baixarUm('${b.id}')">
         <iframe
-          srcdoc="${escHtml(b.html(inf, cup, lnk))}"
+          srcdoc="${escHtml(b.html(inf, cup, lnk, qrDataUrl))}"
           style="width:${b.w}px;height:${b.h}px;transform:scale(${b.scale});transform-origin:top left;"
           scrolling="no"
         ></iframe>
@@ -447,6 +475,7 @@ async function baixarTodos() {
   const inf = document.getElementById('inp-influencer').value.trim().toUpperCase() || 'PRODUTOR DE CONTEÚDO';
   const cup = document.getElementById('inp-cupom').value.trim().toUpperCase() || 'CUPOM';
   const lnk = document.getElementById('inp-link').value.trim() || '';
+  const qrDataUrl = await makeQrDataUrl(lnk, 300);
 
   const lista = currentFilter === 'todos' ? BANNERS : BANNERS.filter(b => b.tipo === currentFilter);
   btn.disabled = true;
@@ -456,7 +485,7 @@ async function baixarTodos() {
     txt.textContent = `Gerando ${i+1} de ${lista.length}: ${lista[i].nome}...`;
     bar.style.width = ((i / lista.length) * 100) + '%';
     await sleep(80);
-    await renderAndDownload(lista[i], inf, cup, lnk);
+    await renderAndDownload(lista[i], inf, cup, lnk, qrDataUrl);
     await sleep(600);
   }
 
@@ -469,12 +498,12 @@ async function baixarTodos() {
   toast('Todos os banners foram baixados!');
 }
 
-function renderAndDownload(b, inf, cup, lnk) {
+function renderAndDownload(b, inf, cup, lnk, qrDataUrl) {
   return new Promise(resolve => {
     const area = document.getElementById('render-area');
     const wrap = document.createElement('div');
     wrap.style.cssText = `width:${b.w}px;height:${b.h}px;position:absolute;top:0;left:0;`;
-    wrap.innerHTML = b.html(inf, cup, lnk);
+    wrap.innerHTML = b.html(inf, cup, lnk, qrDataUrl);
     area.appendChild(wrap);
 
     setTimeout(() => {
@@ -913,9 +942,8 @@ function servicosStory() {
 
 // ── MKT BANNERS (Amorim) ─────────────────────────────────────────
 
-function mktYoutubeMeiaTela(link) {
-  const qrSrc = link ? ("https://api.qrserver.com/v1/create-qr-code/?size=114x114&data=" + encodeURIComponent(link) + "&bgcolor=3366ff&color=ffffff&qzone=1") : "";
-  const qrHtml = link ? '<img src="' + qrSrc + '"/>' : '<div class="placeholder">QR Code<br>aqui</div>';
+function mktYoutubeMeiaTela(link, qrDataUrl) {
+  const qrHtml = qrDataUrl ? '<img src="' + qrDataUrl + '"/>' : '<div class="placeholder">QR Code<br>aqui</div>';
   return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
   *{margin:0;padding:0;box-sizing:border-box;}
   body{width:640px;height:720px;overflow:hidden;}
@@ -931,9 +959,8 @@ function mktYoutubeMeiaTela(link) {
   </div></body></html>`;
 }
 
-function mktYoutubeTela(link) {
-  const qrSrc = link ? ("https://api.qrserver.com/v1/create-qr-code/?size=111x111&data=" + encodeURIComponent(link) + "&bgcolor=3366ff&color=ffffff&qzone=1") : "";
-  const qrHtml = link ? '<img src="' + qrSrc + '"/>' : '<div class="placeholder">QR Code<br>aqui</div>';
+function mktYoutubeTela(link, qrDataUrl) {
+  const qrHtml = qrDataUrl ? '<img src="' + qrDataUrl + '"/>' : '<div class="placeholder">QR Code<br>aqui</div>';
   return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
   *{margin:0;padding:0;box-sizing:border-box;}
   body{width:1280px;height:720px;overflow:hidden;}
@@ -949,9 +976,8 @@ function mktYoutubeTela(link) {
   </div></body></html>`;
 }
 
-function mktStory(link) {
-  const qrSrc = link ? ("https://api.qrserver.com/v1/create-qr-code/?size=259x259&data=" + encodeURIComponent(link) + "&bgcolor=3366ff&color=ffffff&qzone=1") : "";
-  const qrHtml = link ? '<img src="' + qrSrc + '"/>' : '<div class="placeholder">QR Code<br>aqui</div>';
+function mktStory(link, qrDataUrl) {
+  const qrHtml = qrDataUrl ? '<img src="' + qrDataUrl + '"/>' : '<div class="placeholder">QR Code<br>aqui</div>';
   return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
   *{margin:0;padding:0;box-sizing:border-box;}
   body{width:1080px;height:1920px;overflow:hidden;}
@@ -967,9 +993,8 @@ function mktStory(link) {
   </div></body></html>`;
 }
 
-function mktPost(link) {
-  const qrSrc = link ? ("https://api.qrserver.com/v1/create-qr-code/?size=199x199&data=" + encodeURIComponent(link) + "&bgcolor=3366ff&color=ffffff&qzone=1") : "";
-  const qrHtml = link ? '<img src="' + qrSrc + '"/>' : '<div class="placeholder">QR Code<br>aqui</div>';
+function mktPost(link, qrDataUrl) {
+  const qrHtml = qrDataUrl ? '<img src="' + qrDataUrl + '"/>' : '<div class="placeholder">QR Code<br>aqui</div>';
   return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
   *{margin:0;padding:0;box-sizing:border-box;}
   body{width:1080px;height:1350px;overflow:hidden;}
