@@ -382,7 +382,6 @@ function renderCards() {
   const inf = document.getElementById('inp-influencer').value.trim().toUpperCase() || 'PRODUTOR DE CONTEÚDO';
   const cup = document.getElementById('inp-cupom').value.trim().toUpperCase() || 'CUPOM';
   const lnk = document.getElementById('inp-link').value.trim() || '';
-  const lnk = document.getElementById('inp-link').value.trim() || '';
 
   const visible = BANNERS.filter(b => currentFilter === 'todos' || b.tipo === currentFilter);
   document.getElementById('count-label').textContent = visible.length + ' banner' + (visible.length !== 1 ? 's' : '');
@@ -436,7 +435,6 @@ async function baixarUm(id) {
   const inf = document.getElementById('inp-influencer').value.trim().toUpperCase() || 'PRODUTOR DE CONTEÚDO';
   const cup = document.getElementById('inp-cupom').value.trim().toUpperCase() || 'CUPOM';
   const lnk = document.getElementById('inp-link').value.trim() || '';
-  const lnk = document.getElementById('inp-link').value.trim() || '';
   await renderAndDownload(b, inf, cup);
   toast('Download iniciado: ' + b.nome);
 }
@@ -449,7 +447,6 @@ async function baixarTodos() {
   const inf = document.getElementById('inp-influencer').value.trim().toUpperCase() || 'PRODUTOR DE CONTEÚDO';
   const cup = document.getElementById('inp-cupom').value.trim().toUpperCase() || 'CUPOM';
   const lnk = document.getElementById('inp-link').value.trim() || '';
-  const lnk = document.getElementById('inp-link').value.trim() || '';
 
   const lista = currentFilter === 'todos' ? BANNERS : BANNERS.filter(b => b.tipo === currentFilter);
   btn.disabled = true;
@@ -459,7 +456,7 @@ async function baixarTodos() {
     txt.textContent = `Gerando ${i+1} de ${lista.length}: ${lista[i].nome}...`;
     bar.style.width = ((i / lista.length) * 100) + '%';
     await sleep(80);
-    await renderAndDownload(lista[i], inf, cup);
+    await renderAndDownload(lista[i], inf, cup, lnk);
     await sleep(600);
   }
 
@@ -472,12 +469,12 @@ async function baixarTodos() {
   toast('Todos os banners foram baixados!');
 }
 
-function renderAndDownload(b, inf, cup) {
+function renderAndDownload(b, inf, cup, lnk) {
   return new Promise(resolve => {
     const area = document.getElementById('render-area');
     const wrap = document.createElement('div');
     wrap.style.cssText = `width:${b.w}px;height:${b.h}px;position:absolute;top:0;left:0;`;
-    wrap.innerHTML = b.html(inf, cup);
+    wrap.innerHTML = b.html(inf, cup, lnk);
     area.appendChild(wrap);
 
     setTimeout(() => {
