@@ -498,29 +498,77 @@ async function baixarTodos() {
   toast('Todos os banners foram baixados!');
 }
 
+const MKT_QR_POS = {"b09": {"x": 402, "y": 515, "size": 114}, "b10": {"x": 446, "y": 543, "size": 111}, "b11": {"x": 655, "y": 1297, "size": 259}, "b12": {"x": 686, "y": 989, "size": 199}};
 function renderAndDownload(b, inf, cup, lnk, qrDataUrl) {
   return new Promise(resolve => {
+    const slug = (inf + '_' + cup).toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'');
+    const fname = 'amorim_' + b.id + '_' + b.nome.toLowerCase().replace(/[^a-z0-9]+/g,'_') + '_' + slug + '.png';
+    const link = document.createElement('a');
+    link.download = fname;
+
+    // MKT banners: draw directly on canvas (avoids html2canvas taint issues)
+    if (b.tipo === 'amorim' && MKT_QR_POS[b.id]) {
+      const pos = MKT_QR_POS[b.id];
+      const canvas = document.createElement('canvas');
+      canvas.width  = b.w * 2;  // 2x for retina
+      canvas.height = b.h * 2;
+      const ctx = canvas.getContext('2d');
+      ctx.scale(2, 2);
+
+      // Get the background image data URL from the banner function
+      // We extract it from the HTML string the function returns
+      const html = b.html(inf, cup, lnk, qrDataUrl);
+      const bgMatch = html.match(/id="bg" src="([^"]+)"/);
+      if (!bgMatch) { resolve(); return; }
+
+      const bgImg = new Image();
+      bgImg.onload = () => {
+        ctx.drawImage(bgImg, 0, 0, b.w, b.h);
+
+        if (qrDataUrl) {
+          const qrImg = new Image();
+          qrImg.onload = () => {
+            ctx.drawImage(qrImg, pos.x, pos.y, pos.size, pos.size);
+            link.href = canvas.toDataURL('image/png');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            resolve();
+          };
+          qrImg.src = qrDataUrl;
+        } else {
+          link.href = canvas.toDataURL('image/png');
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          resolve();
+        }
+      };
+      bgImg.src = bgMatch[1];
+      return;
+    }
+
+    // Regular banners: use html2canvas
     const area = document.getElementById('render-area');
     const wrap = document.createElement('div');
-    wrap.style.cssText = `width:${b.w}px;height:${b.h}px;position:absolute;top:0;left:0;`;
+    wrap.style.cssText = 'width:' + b.w + 'px;height:' + b.h + 'px;position:absolute;top:0;left:0;';
     wrap.innerHTML = b.html(inf, cup, lnk, qrDataUrl);
     area.appendChild(wrap);
 
     setTimeout(() => {
       const el = wrap.querySelector('#banner') || wrap.firstElementChild;
-      html2canvas(el, { scale: 2, useCORS: true, logging: false }).then(canvas => {
-        const slug = (inf + '_' + cup).toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'');
-        const fname = `amorim_${b.id}_${b.nome.toLowerCase().replace(/[^a-z0-9]+/g,'_')}_${slug}.png`;
-        const link = document.createElement('a');
-        link.download = fname;
+      html2canvas(el, { scale: 2, useCORS: true, allowTaint: true, logging: false }).then(canvas => {
         link.href = canvas.toDataURL('image/png');
+        document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
         area.removeChild(wrap);
         resolve();
       });
-    }, 300);
+    }, 400);
   });
 }
+
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
