@@ -2,16 +2,17 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Amorim Global - Central de Banners Profissional</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <title>Amorim Global - Central de Banners (Edição Premium)</title>
+    <!-- Biblioteca moderna para QR Codes estilizados -->
+    <script type="text/javascript" src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #0d1117; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; height: 100vh; overflow: hidden; }
         
         /* Menu Lateral */
         .sidebar { width: 320px; background: #161b22; padding: 25px; border-right: 1px solid #30363d; flex-shrink: 0; overflow-y: auto; }
-        .sidebar h2 { color: #58a6ff; margin-bottom: 5px; font-size: 24px; }
-        .sidebar p { font-size: 11px; color: #8b949e; text-transform: uppercase; margin-bottom: 25px; }
+        .sidebar img.logo { width: 100%; height: auto; margin-bottom: 15px; display: block; }
+        .sidebar p.subtitle { font-size: 11px; color: #8b949e; text-transform: uppercase; margin-bottom: 25px; border-top: 1px solid #30363d; padding-top: 10px; }
         
         input[type="text"] { width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #30363d; background: #0d1117; color: #fff; margin-bottom: 15px; outline: none; }
         input[type="text"]:focus { border-color: #58a6ff; }
@@ -90,8 +91,8 @@
         /* QR Code Arrastável */
         .qr-overlay { 
             position: absolute; 
-            background: transparent; 
-            padding: 0px;
+            background: #fff; /* Fundo branco sólido para destaque */
+            padding: 4px; /* Respiro branco MAIS FINO */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -99,6 +100,7 @@
             border: 2px dashed rgba(88, 166, 255, 0.5);
             touch-action: none;
             z-index: 10;
+            border-radius: 6px; /* Cantos arredondados proporcionais */
         }
         .qr-overlay.dragging { 
             border: 2px solid #388bfd;
@@ -122,8 +124,8 @@
 <body>
 
 <div class="sidebar">
-    <img src="FdoTransparente_Logo_Amorim04.png" alt="Amorim Global Logo" style="width: 100%; height: auto; margin-bottom: 15px; display: block;">
-    <p style="margin-bottom: 25px; border-top: 1px solid #30363d; padding-top: 10px;">Central de Banners</p>
+    <img src="FdoTransparente_Logo_Amorim04.png" alt="Amorim Global Logo" class="logo">
+    <p class="subtitle">Central de Banners - Edição Premium</p>
     
     <label style="font-size: 13px; display: block; margin-bottom: 5px;">Link de Destino:</label>
     <input type="text" id="urlInput" value="https://www.amorimglobal.com">
@@ -291,6 +293,7 @@
 
     let currentDragging = null;
     let dragOffset = { x: 0, y: 0 };
+    const qrStylingObjects = {};
 
     function mudarAba(abaId, event) {
         document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -305,16 +308,21 @@
             const qrElement = document.getElementById(`qr-${key}`);
             if (!qrElement) return;
             qrElement.innerHTML = "";
-            const canvas = document.createElement('canvas');
-            qrElement.appendChild(canvas);
-            new QRious({
-                element: canvas,
-                value: url,
-                size: 500,
-                padding: 0,
-                background: null,
-                foreground: '#000000'
+            
+            // GERA O QR CODE ESTILO "DOTS" MODERNO
+            const qrStyling = new QRCodeStyling({
+                width: 500,
+                height: 500,
+                data: url,
+                dotsOptions: { color: "#000000", type: "dots" },
+                backgroundOptions: { color: "transparent" },
+                cornersSquareOptions: { type: "extra-rounded", color: "#000000" },
+                cornersDotOptions: { type: "dot", color: "#000000" }
             });
+            
+            qrStyling.append(qrElement);
+            qrStylingObjects[key] = qrStyling;
+
             const size = document.getElementById('sizeSlider').value;
             const wrapper = qrElement.parentElement;
             const newSize = (wrapper.offsetWidth * size) / 100;
@@ -385,42 +393,65 @@
         }
     });
 
-    function baixar(key) {
+    async function baixar(key) {
         const state = qrStates[key];
         const bgImg = document.getElementById(`img-${key}`);
         const qrElement = document.getElementById(`qr-${key}`);
         if (!bgImg || !qrElement) return alert("Imagem ou QR Code não encontrado!");
-        const sourceCanvas = qrElement.querySelector('canvas');
-        if (!sourceCanvas) return alert("Clique em Sincronizar primeiro!");
+        
         const canvas = document.getElementById('exportCanvas');
         const ctx = canvas.getContext('2d');
+        
+        // 1. Define o tamanho real do canvas baseado na imagem original
         canvas.width = bgImg.naturalWidth;
         canvas.height = bgImg.naturalHeight;
+        
+        // 2. Limpa e desenha a imagem de fundo
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(bgImg, 0, 0);
-        const displayWidth = document.getElementById(`img-${key}`).offsetWidth;
-        const scale = canvas.width / displayWidth;
-        const realSize = state.size * displayWidth / 100 * scale;
-        const posX = state.x * scale;
-        const posY = state.y * scale;
-        const tempCanvas = document.createElement('canvas');
-        tempCanvas.width = sourceCanvas.width;
-        tempCanvas.height = sourceCanvas.height;
-        const tempCtx = tempCanvas.getContext('2d');
-        tempCtx.drawImage(sourceCanvas, 0, 0);
-        const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
-        const data = imageData.data;
-        for (let i = 0; i < data.length; i += 4) {
-            if (data[i] > 200 && data[i+1] > 200 && data[i+2] > 200) {
-                data[i+3] = 0; 
-            } else {
-                data[i] = 0; data[i+1] = 0; data[i+2] = 0; data[i+3] = 255;
-            }
-        }
-        tempCtx.putImageData(imageData, 0, 0);
-        ctx.drawImage(tempCanvas, posX, posY, realSize, realSize);
+
+        // 3. CÁLCULO DE ESCALA DE ALTA PRECISÃO
+        // Usamos getBoundingClientRect para pegar o tamanho exato na tela (com decimais)
+        const rect = bgImg.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+
+        // 4. Posição e Tamanho do QR Code
+        // Pegamos a posição relativa ao wrapper da imagem
+        const qrRect = qrElement.getBoundingClientRect();
+        const relativeX = qrRect.left - rect.left;
+        const relativeY = qrRect.top - rect.top;
+        
+        const drawX = relativeX * scaleX;
+        const drawY = relativeY * scaleY;
+        const totalSizeOnCanvas = qrRect.width * scaleX;
+        
+        // 5. Desenha o fundo branco arredondado (Borda Fina)
+        const radius = 6 * scaleX; 
+        ctx.fillStyle = "#ffffff";
+        ctx.beginPath();
+        ctx.moveTo(drawX + radius, drawY);
+        ctx.lineTo(drawX + totalSizeOnCanvas - radius, drawY);
+        ctx.quadraticCurveTo(drawX + totalSizeOnCanvas, drawY, drawX + totalSizeOnCanvas, drawY + radius);
+        ctx.lineTo(drawX + totalSizeOnCanvas, drawY + totalSizeOnCanvas - radius);
+        ctx.quadraticCurveTo(drawX + totalSizeOnCanvas, drawY + totalSizeOnCanvas, drawX + totalSizeOnCanvas - radius, drawY + totalSizeOnCanvas);
+        ctx.lineTo(drawX + radius, drawY + totalSizeOnCanvas);
+        ctx.quadraticCurveTo(drawX, drawY + totalSizeOnCanvas, drawX, drawY + totalSizeOnCanvas - radius);
+        ctx.lineTo(drawX, drawY + radius);
+        ctx.quadraticCurveTo(drawX, drawY, drawX + radius, drawY);
+        ctx.closePath();
+        ctx.fill();
+
+        // 6. Desenha o QR Code por cima (compensando o padding interno de 4px)
+        const paddingOnCanvas = 4 * scaleX;
+        const qrSizeOnCanvas = totalSizeOnCanvas - (paddingOnCanvas * 2);
+        const qrCanvas = qrElement.querySelector('canvas');
+        
+        ctx.drawImage(qrCanvas, drawX + paddingOnCanvas, drawY + paddingOnCanvas, qrSizeOnCanvas, qrSizeOnCanvas);
+
+        // 7. Download
         const link = document.createElement('a');
-        link.download = `Banner_Amorim_${key.toUpperCase()}.png`;
+        link.download = `Banner_Amorim_Premium_${key.toUpperCase()}.png`;
         link.href = canvas.toDataURL("image/png");
         link.click();
     }
