@@ -101,11 +101,6 @@
             border-color: #1a6bff;
         }
 
-        .divider {
-            height: 1px;
-            background: #30363d;
-        }
-
         /* --- BOTÕES --- */
         .btn {
             width: 100%;
@@ -123,18 +118,7 @@
             color: #fff;
         }
 
-        .btn-dl {
-            background: #1a6bff;
-            color: #fff;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        /* --- BARRA DE PROGRESSO --- */
+        /* --- PROGRESS BAR --- */
         .progress-wrap {
             display: none;
             margin-top: 8px;
@@ -189,7 +173,7 @@
         /* --- GRID E CARDS DE BANNERS --- */
         .cards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
             gap: 20px;
         }
 
@@ -205,18 +189,14 @@
             overflow: hidden;
             background: #0d1117;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            height: 300px;
         }
 
-        /* Ajuste para as imagens se comportarem bem dentro do card */
         .card-preview img {
             width: 100%;
-            height: 180px;
-            object-fit: contain; /* Faz com que a imagem inteira apareça sem cortar */
+            height: 100%;
+            object-fit: cover;
             display: block;
-            padding: 10px; /* Um pequeno respiro para os banners não colarem na borda */
         }
 
         .preview-overlay {
@@ -245,22 +225,58 @@
         }
 
         .card-info {
-            padding: 14px 16px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .card-header-info {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-top: 1px solid #30363d;
         }
 
         .card-name {
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 600;
-            margin-bottom: 2px;
         }
 
         .card-dim {
             font-size: 12px;
             color: #8b949e;
+        }
+
+        .downloads-section {
+            border-top: 1px solid #30363d;
+            padding-top: 12px;
+        }
+
+        .downloads-title {
+            font-size: 12px;
+            color: #8b949e;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .downloads-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .btn-dl-version {
+            background: #1a6bff;
+            color: #fff;
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: inline-block;
         }
 
         /* --- TOAST DE NOTIFICAÇÃO --- */
@@ -284,7 +300,7 @@
         <div class="sidebar-header">
             <div class="logo-row">
                 <div class="logo-icon">
-                    <img src="https://via.placeholder.com/150x40/1a6bff/ffffff?text=Logo+Aqui" alt="Logo">
+                    <img src="logo_amorim_sidebar.png" alt="Amorim Logo">
                 </div>
                 <div class="logo-title">Amorim</div>
             </div>
@@ -295,82 +311,9 @@
             <div class="sidebar-section-title">Filtros de Busca</div>
             <div class="field-group">
                 <label>Nome do Banner</label>
-                <input type="text" placeholder="Ex: Campanha Dia das Mães">
+                <input type="text" placeholder="Ex: Cidadania Europeia">
             </div>
             <button class="btn btn-primary">Pesquisar</button>
             
             <div class="progress-wrap">
                 <div class="progress-bar-bg">
-                    <div class="progress-bar"></div>
-                </div>
-                <div class="progress-text">Buscando...</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="main">
-        <div class="main-header">
-            <div class="main-title">Banners Disponíveis</div>
-            <div class="count-label">Exibindo 3 banners</div>
-        </div>
-
-        <div class="cards-grid">
-            
-            <div class="card">
-                <div class="card-preview">
-                    <img src="https://via.placeholder.com/300x250/21262d/ffffff?text=Banner+300x250" alt="Banner Institucional">
-                    
-                    <div class="preview-overlay">
-                        <span>Visualizar Banner</span>
-                    </div>
-                </div>
-                <div class="card-info">
-                    <div>
-                        <div class="card-name">Banner Institucional (Square)</div>
-                        <div class="card-dim">300x250 px</div>
-                    </div>
-                    <button class="btn-dl">Download</button>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-preview">
-                    <img src="https://via.placeholder.com/728x90/21262d/ffffff?text=Banner+728x90" alt="Banner Topo">
-                    
-                    <div class="preview-overlay">
-                        <span>Visualizar Banner</span>
-                    </div>
-                </div>
-                <div class="card-info">
-                    <div>
-                        <div class="card-name">Banner Topo (Leaderboard)</div>
-                        <div class="card-dim">728x90 px</div>
-                    </div>
-                    <button class="btn-dl">Download</button>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-preview">
-                    <img src="https://via.placeholder.com/1080x1080/21262d/ffffff?text=Post+Instagram" alt="Banner Redes Sociais">
-                    
-                    <div class="preview-overlay">
-                        <span>Visualizar Banner</span>
-                    </div>
-                </div>
-                <div class="card-info">
-                    <div>
-                        <div class="card-name">Banner Redes Sociais</div>
-                        <div class="card-dim">1080x1080 px</div>
-                    </div>
-                    <button class="btn-dl">Download</button>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <div id="toast">Ação realizada com sucesso!</div>
-
-</body>
-</html>
