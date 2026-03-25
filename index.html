@@ -205,15 +205,18 @@
             overflow: hidden;
             background: #0d1117;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .card-preview iframe {
-            border: none;
-            display: block;
-            transform-origin: top left;
-            pointer-events: none;
+        /* Ajuste para as imagens se comportarem bem dentro do card */
+        .card-preview img {
             width: 100%;
-            height: 150px; /* Altura de exemplo */
+            height: 180px;
+            object-fit: contain; /* Faz com que a imagem inteira apareça sem cortar */
+            display: block;
+            padding: 10px; /* Um pequeno respiro para os banners não colarem na borda */
         }
 
         .preview-overlay {
@@ -246,6 +249,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            border-top: 1px solid #30363d;
         }
 
         .card-name {
@@ -276,12 +280,10 @@
 </head>
 <body>
 
-    <!-- MENU LATERAL -->
     <div class="sidebar">
         <div class="sidebar-header">
             <div class="logo-row">
                 <div class="logo-icon">
-                    <!-- Substitua o link abaixo pelo da sua imagem real (ex: "img/logo.png") -->
                     <img src="https://via.placeholder.com/150x40/1a6bff/ffffff?text=Logo+Aqui" alt="Logo">
                 </div>
                 <div class="logo-title">Amorim</div>
@@ -306,23 +308,17 @@
         </div>
     </div>
 
-    <!-- CONTEÚDO PRINCIPAL -->
     <div class="main">
         <div class="main-header">
             <div class="main-title">Banners Disponíveis</div>
-            <div class="count-label">Exibindo 1 banner de exemplo</div>
+            <div class="count-label">Exibindo 3 banners</div>
         </div>
 
         <div class="cards-grid">
             
-            <!-- MODELO DE CARD -->
             <div class="card">
                 <div class="card-preview">
-                    <!-- O iframe abaixo serve para exibir o banner se ele for HTML -->
-                    <!-- <iframe src="banner_exemplo.html"></iframe> -->
-                    
-                    <!-- Para fim de visualização, coloquei uma cor sólida aqui -->
-                    <div style="height: 180px; width: 100%; background-color: #21262d;"></div>
+                    <img src="https://via.placeholder.com/300x250/21262d/ffffff?text=Banner+300x250" alt="Banner Institucional">
                     
                     <div class="preview-overlay">
                         <span>Visualizar Banner</span>
@@ -330,18 +326,50 @@
                 </div>
                 <div class="card-info">
                     <div>
-                        <div class="card-name">Banner Institucional</div>
+                        <div class="card-name">Banner Institucional (Square)</div>
                         <div class="card-dim">300x250 px</div>
                     </div>
                     <button class="btn-dl">Download</button>
                 </div>
             </div>
-            <!-- FIM DO MODELO DE CARD -->
+
+            <div class="card">
+                <div class="card-preview">
+                    <img src="https://via.placeholder.com/728x90/21262d/ffffff?text=Banner+728x90" alt="Banner Topo">
+                    
+                    <div class="preview-overlay">
+                        <span>Visualizar Banner</span>
+                    </div>
+                </div>
+                <div class="card-info">
+                    <div>
+                        <div class="card-name">Banner Topo (Leaderboard)</div>
+                        <div class="card-dim">728x90 px</div>
+                    </div>
+                    <button class="btn-dl">Download</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-preview">
+                    <img src="https://via.placeholder.com/1080x1080/21262d/ffffff?text=Post+Instagram" alt="Banner Redes Sociais">
+                    
+                    <div class="preview-overlay">
+                        <span>Visualizar Banner</span>
+                    </div>
+                </div>
+                <div class="card-info">
+                    <div>
+                        <div class="card-name">Banner Redes Sociais</div>
+                        <div class="card-dim">1080x1080 px</div>
+                    </div>
+                    <button class="btn-dl">Download</button>
+                </div>
+            </div>
 
         </div>
     </div>
 
-    <!-- MENSAGEM DE SUCESSO -->
     <div id="toast">Ação realizada com sucesso!</div>
 
 </body>
