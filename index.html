@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Amorim Global - Central de Banners (Edição Premium)</title>
+    <title>Amorim Global - Central de Banners (Edição Premium + Cupom)</title>
     <!-- Biblioteca moderna para QR Codes estilizados -->
     <script type="text/javascript" src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
     <style>
@@ -14,7 +14,10 @@
         .sidebar img.logo { width: 100%; height: auto; margin-bottom: 15px; display: block; }
         .sidebar p.subtitle { font-size: 11px; color: #8b949e; text-transform: uppercase; margin-bottom: 25px; border-top: 1px solid #30363d; padding-top: 10px; }
         
-        input[type="text"] { width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #30363d; background: #0d1117; color: #fff; margin-bottom: 15px; outline: none; }
+        .field-group { margin-bottom: 20px; }
+        .field-group label { font-size: 13px; display: block; margin-bottom: 8px; color: #c9d1d9; }
+        
+        input[type="text"] { width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #30363d; background: #0d1117; color: #fff; margin-bottom: 10px; outline: none; }
         input[type="text"]:focus { border-color: #58a6ff; }
         
         button { width: 100%; padding: 12px; cursor: pointer; border-radius: 6px; border: none; font-weight: bold; transition: 0.2s; margin-bottom: 10px; }
@@ -91,8 +94,8 @@
         /* QR Code Arrastável */
         .qr-overlay { 
             position: absolute; 
-            background: #fff; /* Fundo branco sólido para destaque */
-            padding: 4px; /* Respiro branco MAIS FINO */
+            background: #fff; 
+            padding: 4px; 
             display: flex;
             align-items: center;
             justify-content: center;
@@ -100,7 +103,7 @@
             border: 2px dashed rgba(88, 166, 255, 0.5);
             touch-action: none;
             z-index: 10;
-            border-radius: 6px; /* Cantos arredondados proporcionais */
+            border-radius: 6px;
         }
         .qr-overlay.dragging { 
             border: 2px solid #388bfd;
@@ -108,6 +111,27 @@
             z-index: 1000;
         }
         .qr-overlay canvas { width: 100% !important; height: 100% !important; background: transparent !important; pointer-events: none; }
+
+        /* Cupom Arrastável */
+        .coupon-overlay {
+            position: absolute;
+            color: #fff;
+            font-weight: 900;
+            font-size: 18px;
+            text-transform: uppercase;
+            cursor: move;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            padding: 2px 8px;
+            white-space: nowrap;
+            user-select: none;
+            z-index: 20;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        .coupon-overlay.dragging {
+            border: 2px solid #fff;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+        }
 
         /* Info Box */
         .info-box { 
@@ -125,90 +149,102 @@
 
 <div class="sidebar">
     <img src="FdoTransparente_Logo_Amorim04.png" alt="Amorim Global Logo" class="logo">
-    <p class="subtitle">Central de Banners - Time Parcerias</p>
+    <p class="subtitle">Central de Banners - Edição Premium</p>
     
-    <label style="font-size: 13px; display: block; margin-bottom: 5px;">Link de Destino:</label>
-    <input type="text" id="urlInput" value="https://www.amorimglobal.com">
+    <div class="field-group">
+        <label>Link do QR Code:</label>
+        <input type="text" id="urlInput" value="https://www.amorimglobal.com">
+    </div>
+
+    <div class="field-group">
+        <label>Código do Cupom:</label>
+        <input type="text" id="couponInput" value="AMORIM10" oninput="atualizarCupomGlobal(this.value)">
+    </div>
+
     <button class="btn-update" onclick="gerarTudo()">Sincronizar Banners</button>
     
     <div class="controls">
         <label>Tamanho do QR Code (%):</label>
         <input type="range" id="sizeSlider" min="5" max="50" value="15" oninput="atualizarTamanhoGlobal(this.value)">
-        <div class="size-display">Tamanho: <span id="sizeValue">15</span>%</div>
+        <div class="size-display">Tamanho QR: <span id="sizeValue">15</span>%</div>
+        
+        <label style="margin-top: 15px;">Tamanho do Cupom (px):</label>
+        <input type="range" id="couponSizeSlider" min="10" max="60" value="24" oninput="atualizarTamanhoCupom(this.value)">
+        <div class="size-display">Tamanho Cupom: <span id="couponSizeValue">24</span>px</div>
     </div>
 
     <button class="btn-reset" onclick="resetarPosicoes()">Resetar Posições</button>
 
     <div class="info-box">
         <strong>📌 COMO USAR:</strong>
-        <p style="margin-top: 8px;">1. Clique em "Sincronizar Banners"</p>
-        <p>2. Escolha a categoria (aba)</p>
-        <p>3. Arraste o QR Code com o mouse</p>
-        <p>4. Use o slider para ajustar o tamanho</p>
+        <p style="margin-top: 8px;">1. Digite o Link e o Cupom</p>
+        <p>2. Clique em "Sincronizar Banners"</p>
+        <p>3. Arraste o QR Code e o Cupom</p>
+        <p>4. Ajuste os tamanhos nos sliders</p>
         <p>5. Clique em "Download PNG"</p>
     </div>
 </div>
 
 <div class="main">
-    <!-- ABAS DE CATEGORIAS -->
     <div class="tabs-container">
         <button class="tab-button active" onclick="mudarAba('instagram', event)">📸 Instagram</button>
         <button class="tab-button" onclick="mudarAba('youtube', event)">▶️ YouTube</button>
     </div>
 
-    <!-- CONTEÚDO DAS ABAS -->
-    
     <!-- ABA INSTAGRAM -->
     <div id="instagram" class="tab-content active">
         <div class="grid">
-            <!-- POSTS -->
             <div class="card">
-                <div class="card-title">Feed Instagram / Facebook (POST.png)</div>
+                <div class="card-title">Feed Instagram (POST.png)</div>
                 <div class="banner-wrapper">
                     <img src="POST.png" id="img-post">
                     <div id="qr-post" class="qr-overlay" data-key="post"></div>
+                    <div id="coupon-post" class="coupon-overlay" data-key="post">AMORIM10</div>
                 </div>
                 <button class="btn-download" onclick="baixar('post')">Download PNG</button>
             </div>
             <div class="card">
-                <div class="card-title">Feed Instagram / Facebook (POST2.png)</div>
+                <div class="card-title">Feed Instagram (POST2.png)</div>
                 <div class="banner-wrapper">
                     <img src="POST2.png" id="img-post2">
                     <div id="qr-post2" class="qr-overlay" data-key="post2"></div>
+                    <div id="coupon-post2" class="coupon-overlay" data-key="post2">AMORIM10</div>
                 </div>
                 <button class="btn-download" onclick="baixar('post2')">Download PNG</button>
             </div>
             <div class="card">
-                <div class="card-title">Feed Instagram / Facebook (POST3.png)</div>
+                <div class="card-title">Feed Instagram (POST3.png)</div>
                 <div class="banner-wrapper">
                     <img src="POST3.png" id="img-post3">
                     <div id="qr-post3" class="qr-overlay" data-key="post3"></div>
+                    <div id="coupon-post3" class="coupon-overlay" data-key="post3">AMORIM10</div>
                 </div>
                 <button class="btn-download" onclick="baixar('post3')">Download PNG</button>
             </div>
-
-            <!-- STORIES -->
             <div class="card">
-                <div class="card-title">Stories / Reels (STORY.png)</div>
+                <div class="card-title">Stories (STORY.png)</div>
                 <div class="banner-wrapper">
                     <img src="STORY.png" id="img-story">
                     <div id="qr-story" class="qr-overlay" data-key="story"></div>
+                    <div id="coupon-story" class="coupon-overlay" data-key="story">AMORIM10</div>
                 </div>
                 <button class="btn-download" onclick="baixar('story')">Download PNG</button>
             </div>
             <div class="card">
-                <div class="card-title">Stories / Reels (STORY2.png)</div>
+                <div class="card-title">Stories (STORY2.png)</div>
                 <div class="banner-wrapper">
                     <img src="STORY2.png" id="img-story2">
                     <div id="qr-story2" class="qr-overlay" data-key="story2"></div>
+                    <div id="coupon-story2" class="coupon-overlay" data-key="story2">AMORIM10</div>
                 </div>
                 <button class="btn-download" onclick="baixar('story2')">Download PNG</button>
             </div>
             <div class="card">
-                <div class="card-title">Stories / Reels (STORY3.png)</div>
+                <div class="card-title">Stories (STORY3.png)</div>
                 <div class="banner-wrapper">
                     <img src="STORY3.png" id="img-story3">
                     <div id="qr-story3" class="qr-overlay" data-key="story3"></div>
+                    <div id="coupon-story3" class="coupon-overlay" data-key="story3">AMORIM10</div>
                 </div>
                 <button class="btn-download" onclick="baixar('story3')">Download PNG</button>
             </div>
@@ -218,12 +254,12 @@
     <!-- ABA YOUTUBE -->
     <div id="youtube" class="tab-content">
         <div class="grid">
-            <!-- TELA CHEIA -->
             <div class="card">
                 <div class="card-title">YouTube Tela Cheia (YOUTUBE TELA.png)</div>
                 <div class="banner-wrapper">
                     <img src="YOUTUBE TELA.png" id="img-yt-tela">
                     <div id="qr-yt-tela" class="qr-overlay" data-key="yt-tela"></div>
+                    <div id="coupon-yt-tela" class="coupon-overlay" data-key="yt-tela">AMORIM10</div>
                 </div>
                 <button class="btn-download" onclick="baixar('yt-tela')">Download PNG</button>
             </div>
@@ -232,6 +268,7 @@
                 <div class="banner-wrapper">
                     <img src="YOUTUBE TELA2.png" id="img-yt-tela2">
                     <div id="qr-yt-tela2" class="qr-overlay" data-key="yt-tela2"></div>
+                    <div id="coupon-yt-tela2" class="coupon-overlay" data-key="yt-tela2">AMORIM10</div>
                 </div>
                 <button class="btn-download" onclick="baixar('yt-tela2')">Download PNG</button>
             </div>
@@ -240,16 +277,16 @@
                 <div class="banner-wrapper">
                     <img src="YOUTUBE TELA3.png" id="img-yt-tela3">
                     <div id="qr-yt-tela3" class="qr-overlay" data-key="yt-tela3"></div>
+                    <div id="coupon-yt-tela3" class="coupon-overlay" data-key="yt-tela3">AMORIM10</div>
                 </div>
                 <button class="btn-download" onclick="baixar('yt-tela3')">Download PNG</button>
             </div>
-
-            <!-- MEIA TELA -->
             <div class="card">
                 <div class="card-title">YouTube Meia Tela (YOUTUBE MEIA TELA.png)</div>
                 <div class="banner-wrapper">
                     <img src="YOUTUBE MEIA TELA.png" id="img-yt-meia">
                     <div id="qr-yt-meia" class="qr-overlay" data-key="yt-meia"></div>
+                    <div id="coupon-yt-meia" class="coupon-overlay" data-key="yt-meia">AMORIM10</div>
                 </div>
                 <button class="btn-download" onclick="baixar('yt-meia')">Download PNG</button>
             </div>
@@ -258,6 +295,7 @@
                 <div class="banner-wrapper">
                     <img src="YOUTUBE MEIA TELA2.png" id="img-yt-meia2">
                     <div id="qr-yt-meia2" class="qr-overlay" data-key="yt-meia2"></div>
+                    <div id="coupon-yt-meia2" class="coupon-overlay" data-key="yt-meia2">AMORIM10</div>
                 </div>
                 <button class="btn-download" onclick="baixar('yt-meia2')">Download PNG</button>
             </div>
@@ -266,6 +304,7 @@
                 <div class="banner-wrapper">
                     <img src="YOUTUBE MEIA TELA3.png" id="img-yt-meia3">
                     <div id="qr-yt-meia3" class="qr-overlay" data-key="yt-meia3"></div>
+                    <div id="coupon-yt-meia3" class="coupon-overlay" data-key="yt-meia3">AMORIM10</div>
                 </div>
                 <button class="btn-download" onclick="baixar('yt-meia3')">Download PNG</button>
             </div>
@@ -276,24 +315,18 @@
 <canvas id="exportCanvas" style="display:none;"></canvas>
 
 <script>
-    const qrStates = {
-        'post': { x: 0, y: 0, size: 15 },
-        'post2': { x: 0, y: 0, size: 15 },
-        'post3': { x: 0, y: 0, size: 15 },
-        'story': { x: 0, y: 0, size: 15 },
-        'story2': { x: 0, y: 0, size: 15 },
-        'story3': { x: 0, y: 0, size: 15 },
-        'yt-tela': { x: 0, y: 0, size: 15 },
-        'yt-tela2': { x: 0, y: 0, size: 15 },
-        'yt-tela3': { x: 0, y: 0, size: 15 },
-        'yt-meia': { x: 0, y: 0, size: 15 },
-        'yt-meia2': { x: 0, y: 0, size: 15 },
-        'yt-meia3': { x: 0, y: 0, size: 15 }
-    };
+    const bannerKeys = ['post', 'post2', 'post3', 'story', 'story2', 'story3', 'yt-tela', 'yt-tela2', 'yt-tela3', 'yt-meia', 'yt-meia2', 'yt-meia3'];
+    
+    const qrStates = {};
+    const couponStates = {};
+    bannerKeys.forEach(key => {
+        qrStates[key] = { x: 0, y: 0, size: 15 };
+        couponStates[key] = { x: 50, y: 50, size: 24 };
+    });
 
     let currentDragging = null;
+    let dragType = null; // 'qr' ou 'coupon'
     let dragOffset = { x: 0, y: 0 };
-    const qrStylingObjects = {};
 
     function mudarAba(abaId, event) {
         document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -304,13 +337,16 @@
 
     function gerarTudo() {
         const url = document.getElementById('urlInput').value || "https://www.amorimglobal.com";
-        Object.keys(qrStates).forEach(key => {
+        const couponText = document.getElementById('couponInput').value || "AMORIM10";
+        
+        bannerKeys.forEach(key => {
             const qrElement = document.getElementById(`qr-${key}`);
-            if (!qrElement) return;
-            qrElement.innerHTML = "";
+            const couponElement = document.getElementById(`coupon-${key}`);
+            if (!qrElement || !couponElement) return;
             
-            // GERA O QR CODE ESTILO "DOTS" MODERNO
-            const qrStyling = new QRCodeStyling({
+            // QR Code
+            qrElement.innerHTML = "";
+            new QRCodeStyling({
                 width: 500,
                 height: 500,
                 data: url,
@@ -318,22 +354,33 @@
                 backgroundOptions: { color: "transparent" },
                 cornersSquareOptions: { type: "extra-rounded", color: "#000000" },
                 cornersDotOptions: { type: "dot", color: "#000000" }
-            });
-            
-            qrStyling.append(qrElement);
-            qrStylingObjects[key] = qrStyling;
+            }).append(qrElement);
 
-            const size = document.getElementById('sizeSlider').value;
+            // Cupom
+            couponElement.textContent = couponText;
+
+            // Ajusta tamanhos iniciais
+            const qrSizePercent = document.getElementById('sizeSlider').value;
             const wrapper = qrElement.parentElement;
-            const newSize = (wrapper.offsetWidth * size) / 100;
-            qrElement.style.width = newSize + 'px';
-            qrElement.style.height = newSize + 'px';
+            const newQrSize = (wrapper.offsetWidth * qrSizePercent) / 100;
+            qrElement.style.width = newQrSize + 'px';
+            qrElement.style.height = newQrSize + 'px';
+            
+            const couponSizePx = document.getElementById('couponSizeSlider').value;
+            couponElement.style.fontSize = couponSizePx + 'px';
+        });
+    }
+
+    function atualizarCupomGlobal(text) {
+        bannerKeys.forEach(key => {
+            const el = document.getElementById(`coupon-${key}`);
+            if (el) el.textContent = text;
         });
     }
 
     function atualizarTamanhoGlobal(size) {
         document.getElementById('sizeValue').textContent = size;
-        Object.keys(qrStates).forEach(key => {
+        bannerKeys.forEach(key => {
             const qrElement = document.getElementById(`qr-${key}`);
             if (!qrElement) return;
             const wrapper = qrElement.parentElement;
@@ -344,25 +391,49 @@
         });
     }
 
+    function atualizarTamanhoCupom(size) {
+        document.getElementById('couponSizeValue').textContent = size;
+        bannerKeys.forEach(key => {
+            const el = document.getElementById(`coupon-${key}`);
+            if (el) {
+                el.style.fontSize = size + 'px';
+                couponStates[key].size = parseFloat(size);
+            }
+        });
+    }
+
     function resetarPosicoes() {
-        Object.keys(qrStates).forEach(key => {
+        bannerKeys.forEach(key => {
             qrStates[key] = { x: 0, y: 0, size: 15 };
-            const qrElement = document.getElementById(`qr-${key}`);
-            if (!qrElement) return;
-            qrElement.style.left = '0px';
-            qrElement.style.top = '0px';
+            couponStates[key] = { x: 50, y: 50, size: 24 };
+            
+            const qrEl = document.getElementById(`qr-${key}`);
+            const cpEl = document.getElementById(`coupon-${key}`);
+            if (qrEl) { qrEl.style.left = '0px'; qrEl.style.top = '0px'; }
+            if (cpEl) { cpEl.style.left = '50px'; cpEl.style.top = '50px'; }
         });
         atualizarTamanhoGlobal(15);
+        atualizarTamanhoCupom(24);
         document.getElementById('sizeSlider').value = 15;
+        document.getElementById('couponSizeSlider').value = 24;
     }
 
     document.addEventListener('mousedown', (e) => {
         const qrElement = e.target.closest('.qr-overlay');
+        const couponElement = e.target.closest('.coupon-overlay');
+        
         if (qrElement) {
-            const key = qrElement.getAttribute('data-key');
-            currentDragging = key;
+            currentDragging = qrElement.getAttribute('data-key');
+            dragType = 'qr';
             qrElement.classList.add('dragging');
             const rect = qrElement.getBoundingClientRect();
+            dragOffset.x = e.clientX - rect.left;
+            dragOffset.y = e.clientY - rect.top;
+        } else if (couponElement) {
+            currentDragging = couponElement.getAttribute('data-key');
+            dragType = 'coupon';
+            couponElement.classList.add('dragging');
+            const rect = couponElement.getBoundingClientRect();
             dragOffset.x = e.clientX - rect.left;
             dragOffset.y = e.clientY - rect.top;
         }
@@ -370,86 +441,105 @@
 
     document.addEventListener('mousemove', (e) => {
         if (currentDragging) {
-            const qrElement = document.getElementById(`qr-${currentDragging}`);
-            if (!qrElement) return;
-            const wrapper = qrElement.parentElement;
+            const elId = dragType === 'qr' ? `qr-${currentDragging}` : `coupon-${currentDragging}`;
+            const el = document.getElementById(elId);
+            if (!el) return;
+            
+            const wrapper = el.parentElement;
             const wrapperRect = wrapper.getBoundingClientRect();
+            
             let newX = e.clientX - wrapperRect.left - dragOffset.x;
             let newY = e.clientY - wrapperRect.top - dragOffset.y;
-            newX = Math.max(0, Math.min(newX, wrapper.offsetWidth - qrElement.offsetWidth));
-            newY = Math.max(0, Math.min(newY, wrapper.offsetHeight - qrElement.offsetHeight));
-            qrElement.style.left = newX + 'px';
-            qrElement.style.top = newY + 'px';
-            qrStates[currentDragging].x = newX;
-            qrStates[currentDragging].y = newY;
+            
+            newX = Math.max(0, Math.min(newX, wrapper.offsetWidth - el.offsetWidth));
+            newY = Math.max(0, Math.min(newY, wrapper.offsetHeight - el.offsetHeight));
+            
+            el.style.left = newX + 'px';
+            el.style.top = newY + 'px';
+            
+            if (dragType === 'qr') {
+                qrStates[currentDragging].x = newX;
+                qrStates[currentDragging].y = newY;
+            } else {
+                couponStates[currentDragging].x = newX;
+                couponStates[currentDragging].y = newY;
+            }
         }
     });
 
     document.addEventListener('mouseup', () => {
         if (currentDragging) {
-            const qrElement = document.getElementById(`qr-${currentDragging}`);
-            if (qrElement) qrElement.classList.remove('dragging');
+            const elId = dragType === 'qr' ? `qr-${currentDragging}` : `coupon-${currentDragging}`;
+            const el = document.getElementById(elId);
+            if (el) el.classList.remove('dragging');
             currentDragging = null;
+            dragType = null;
         }
     });
 
     async function baixar(key) {
-        const state = qrStates[key];
         const bgImg = document.getElementById(`img-${key}`);
-        const qrElement = document.getElementById(`qr-${key}`);
-        if (!bgImg || !qrElement) return alert("Imagem ou QR Code não encontrado!");
+        const qrEl = document.getElementById(`qr-${key}`);
+        const cpEl = document.getElementById(`coupon-${key}`);
+        if (!bgImg || !qrEl || !cpEl) return alert("Elementos não encontrados!");
         
         const canvas = document.getElementById('exportCanvas');
         const ctx = canvas.getContext('2d');
-        
-        // 1. Define o tamanho real do canvas baseado na imagem original
         canvas.width = bgImg.naturalWidth;
         canvas.height = bgImg.naturalHeight;
-        
-        // 2. Limpa e desenha a imagem de fundo
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(bgImg, 0, 0);
 
-        // 3. CÁLCULO DE ESCALA DE ALTA PRECISÃO
-        // Usamos getBoundingClientRect para pegar o tamanho exato na tela (com decimais)
         const rect = bgImg.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
 
-        // 4. Posição e Tamanho do QR Code
-        // Pegamos a posição relativa ao wrapper da imagem
-        const qrRect = qrElement.getBoundingClientRect();
-        const relativeX = qrRect.left - rect.left;
-        const relativeY = qrRect.top - rect.top;
+        // 1. Desenha o QR Code
+        const qrRect = qrEl.getBoundingClientRect();
+        const qrDrawX = (qrRect.left - rect.left) * scaleX;
+        const qrDrawY = (qrRect.top - rect.top) * scaleY;
+        const qrTotalSize = qrRect.width * scaleX;
         
-        const drawX = relativeX * scaleX;
-        const drawY = relativeY * scaleY;
-        const totalSizeOnCanvas = qrRect.width * scaleX;
-        
-        // 5. Desenha o fundo branco arredondado (Borda Fina)
+        // Fundo branco arredondado do QR
         const radius = 6 * scaleX; 
         ctx.fillStyle = "#ffffff";
         ctx.beginPath();
-        ctx.moveTo(drawX + radius, drawY);
-        ctx.lineTo(drawX + totalSizeOnCanvas - radius, drawY);
-        ctx.quadraticCurveTo(drawX + totalSizeOnCanvas, drawY, drawX + totalSizeOnCanvas, drawY + radius);
-        ctx.lineTo(drawX + totalSizeOnCanvas, drawY + totalSizeOnCanvas - radius);
-        ctx.quadraticCurveTo(drawX + totalSizeOnCanvas, drawY + totalSizeOnCanvas, drawX + totalSizeOnCanvas - radius, drawY + totalSizeOnCanvas);
-        ctx.lineTo(drawX + radius, drawY + totalSizeOnCanvas);
-        ctx.quadraticCurveTo(drawX, drawY + totalSizeOnCanvas, drawX, drawY + totalSizeOnCanvas - radius);
-        ctx.lineTo(drawX, drawY + radius);
-        ctx.quadraticCurveTo(drawX, drawY, drawX + radius, drawY);
+        ctx.moveTo(qrDrawX + radius, qrDrawY);
+        ctx.lineTo(qrDrawX + qrTotalSize - radius, qrDrawY);
+        ctx.quadraticCurveTo(qrDrawX + qrTotalSize, qrDrawY, qrDrawX + qrTotalSize, qrDrawY + radius);
+        ctx.lineTo(qrDrawX + qrTotalSize, qrDrawY + qrTotalSize - radius);
+        ctx.quadraticCurveTo(qrDrawX + qrTotalSize, qrDrawY + qrTotalSize, qrDrawX + qrTotalSize - radius, qrDrawY + qrTotalSize);
+        ctx.lineTo(qrDrawX + radius, qrDrawY + qrTotalSize);
+        ctx.quadraticCurveTo(qrDrawX, qrDrawY + qrTotalSize, qrDrawX, qrDrawY + qrTotalSize - radius);
+        ctx.lineTo(qrDrawX, qrDrawY + radius);
+        ctx.quadraticCurveTo(qrDrawX, qrDrawY, qrDrawX + radius, qrDrawY);
         ctx.closePath();
         ctx.fill();
 
-        // 6. Desenha o QR Code por cima (compensando o padding interno de 4px)
         const paddingOnCanvas = 4 * scaleX;
-        const qrSizeOnCanvas = totalSizeOnCanvas - (paddingOnCanvas * 2);
-        const qrCanvas = qrElement.querySelector('canvas');
-        
-        ctx.drawImage(qrCanvas, drawX + paddingOnCanvas, drawY + paddingOnCanvas, qrSizeOnCanvas, qrSizeOnCanvas);
+        const qrSizeOnCanvas = qrTotalSize - (paddingOnCanvas * 2);
+        const qrCanvas = qrEl.querySelector('canvas');
+        ctx.drawImage(qrCanvas, qrDrawX + paddingOnCanvas, qrDrawY + paddingOnCanvas, qrSizeOnCanvas, qrSizeOnCanvas);
 
-        // 7. Download
+        // 2. Desenha o Cupom
+        const cpRect = cpEl.getBoundingClientRect();
+        const cpDrawX = (cpRect.left - rect.left) * scaleX;
+        const cpDrawY = (cpRect.top - rect.top) * scaleY;
+        
+        const fontSizeOnCanvas = couponStates[key].size * scaleY;
+        ctx.font = `900 ${fontSizeOnCanvas}px "Segoe UI", sans-serif`;
+        ctx.fillStyle = "#ffffff";
+        ctx.textBaseline = "top";
+        
+        // Sombra sutil no cupom
+        ctx.shadowColor = "rgba(0,0,0,0.5)";
+        ctx.shadowBlur = 4 * scaleY;
+        ctx.shadowOffsetX = 1 * scaleX;
+        ctx.shadowOffsetY = 1 * scaleY;
+        
+        ctx.fillText(cpEl.textContent, cpDrawX + (8 * scaleX), cpDrawY + (2 * scaleY));
+
+        // Download
         const link = document.createElement('a');
         link.download = `Banner_Amorim_Premium_${key.toUpperCase()}.png`;
         link.href = canvas.toDataURL("image/png");
