@@ -189,6 +189,8 @@
     <div class="tabs-container">
         <button class="tab-button active" onclick="mudarAba('instagram', event)">📸 Instagram</button>
         <button class="tab-button" onclick="mudarAba('youtube', event)">▶️ YouTube</button>
+        <button class="tab-button" onclick="mudarAba('en', event)">🇺🇸 English</button>
+        <button class="tab-button" onclick="mudarAba('es', event)">🇪🇸 Español</button>
     </div>
 
     <!-- ABA INSTAGRAM -->
@@ -310,12 +312,96 @@
             </div>
         </div>
     </div>
+
+    <!-- ABA ENGLISH -->
+    <div id="en" class="tab-content">
+        <div class="grid">
+            <div class="card">
+                <div class="card-title">Feed Instagram EN (ENpost-2.png)</div>
+                <div class="banner-wrapper">
+                    <img src="ENpost-2.png" id="img-en-post">
+                    <div id="qr-en-post" class="qr-overlay" data-key="en-post"></div>
+                    <div id="coupon-en-post" class="coupon-overlay" data-key="en-post">AMORIM10</div>
+                </div>
+                <button class="btn-download" onclick="baixar('en-post')">Download PNG</button>
+            </div>
+            <div class="card">
+                <div class="card-title">Stories EN (ENstory-2.png)</div>
+                <div class="banner-wrapper">
+                    <img src="ENstory-2.png" id="img-en-story">
+                    <div id="qr-en-story" class="qr-overlay" data-key="en-story"></div>
+                    <div id="coupon-en-story" class="coupon-overlay" data-key="en-story">AMORIM10</div>
+                </div>
+                <button class="btn-download" onclick="baixar('en-story')">Download PNG</button>
+            </div>
+            <div class="card">
+                <div class="card-title">YouTube Tela Cheia EN (ENtela youtube-2.png)</div>
+                <div class="banner-wrapper">
+                    <img src="ENtela youtube-2.png" id="img-en-yt-tela">
+                    <div id="qr-en-yt-tela" class="qr-overlay" data-key="en-yt-tela"></div>
+                    <div id="coupon-en-yt-tela" class="coupon-overlay" data-key="en-yt-tela">AMORIM10</div>
+                </div>
+                <button class="btn-download" onclick="baixar('en-yt-tela')">Download PNG</button>
+            </div>
+            <div class="card">
+                <div class="card-title">YouTube Meia Tela EN (ENmeia tela-2.png)</div>
+                <div class="banner-wrapper">
+                    <img src="ENmeia tela-2.png" id="img-en-yt-meia">
+                    <div id="qr-en-yt-meia" class="qr-overlay" data-key="en-yt-meia"></div>
+                    <div id="coupon-en-yt-meia" class="coupon-overlay" data-key="en-yt-meia">AMORIM10</div>
+                </div>
+                <button class="btn-download" onclick="baixar('en-yt-meia')">Download PNG</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ABA ESPAÑOL -->
+    <div id="es" class="tab-content">
+        <div class="grid">
+            <div class="card">
+                <div class="card-title">Feed Instagram ES (post ES.png)</div>
+                <div class="banner-wrapper">
+                    <img src="post ES.png" id="img-es-post">
+                    <div id="qr-es-post" class="qr-overlay" data-key="es-post"></div>
+                    <div id="coupon-es-post" class="coupon-overlay" data-key="es-post">AMORIM10</div>
+                </div>
+                <button class="btn-download" onclick="baixar('es-post')">Download PNG</button>
+            </div>
+            <div class="card">
+                <div class="card-title">Stories ES (story ES.png)</div>
+                <div class="banner-wrapper">
+                    <img src="story ES.png" id="img-es-story">
+                    <div id="qr-es-story" class="qr-overlay" data-key="es-story"></div>
+                    <div id="coupon-es-story" class="coupon-overlay" data-key="es-story">AMORIM10</div>
+                </div>
+                <button class="btn-download" onclick="baixar('es-story')">Download PNG</button>
+            </div>
+            <div class="card">
+                <div class="card-title">YouTube Tela Cheia ES (ES-tela youtube.png)</div>
+                <div class="banner-wrapper">
+                    <img src="ES-tela youtube.png" id="img-es-yt-tela">
+                    <div id="qr-es-yt-tela" class="qr-overlay" data-key="es-yt-tela"></div>
+                    <div id="coupon-es-yt-tela" class="coupon-overlay" data-key="es-yt-tela">AMORIM10</div>
+                </div>
+                <button class="btn-download" onclick="baixar('es-yt-tela')">Download PNG</button>
+            </div>
+            <div class="card">
+                <div class="card-title">YouTube Meia Tela ES (ESmeia tela.png)</div>
+                <div class="banner-wrapper">
+                    <img src="ESmeia tela.png" id="img-es-yt-meia">
+                    <div id="qr-es-yt-meia" class="qr-overlay" data-key="es-yt-meia"></div>
+                    <div id="coupon-es-yt-meia" class="coupon-overlay" data-key="es-yt-meia">AMORIM10</div>
+                </div>
+                <button class="btn-download" onclick="baixar('es-yt-meia')">Download PNG</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <canvas id="exportCanvas" style="display:none;"></canvas>
 
 <script>
-    const bannerKeys = ['post', 'post2', 'post3', 'story', 'story2', 'story3', 'yt-tela', 'yt-tela2', 'yt-tela3', 'yt-meia', 'yt-meia2', 'yt-meia3'];
+    const bannerKeys = ['post', 'post2', 'post3', 'story', 'story2', 'story3', 'yt-tela', 'yt-tela2', 'yt-tela3', 'yt-meia', 'yt-meia2', 'yt-meia3', 'en-post', 'en-story', 'en-yt-tela', 'en-yt-meia', 'es-post', 'es-story', 'es-yt-tela', 'es-yt-meia'];
     
     const qrStates = {};
     const couponStates = {};
